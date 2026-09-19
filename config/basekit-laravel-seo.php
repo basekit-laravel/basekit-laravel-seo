@@ -34,8 +34,26 @@ return [
         'title_suffix' => '',
         'description' => '',
         'og_image' => null,
+        'twitter_card' => 'summary_large_image',
         'locale' => 'en',
         'url' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Canonical URLs
+    |--------------------------------------------------------------------------
+    |
+    | Default canonical URL resolution. `base_url` takes precedence over the
+    | application's `app.url`. When neither is set, the request host is only
+    | used to build a canonical URL if it appears in `trusted_hosts`; otherwise
+    | no canonical URL is invented.
+    |
+    */
+
+    'canonical' => [
+        'base_url' => env('BASEKIT_SEO_CANONICAL_URL'),
+        'trusted_hosts' => [],
     ],
 
     /*

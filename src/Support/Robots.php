@@ -38,10 +38,10 @@ class Robots
         array $disallow = [],
         ?string $sitemap = null,
     ) {
-        $this->userAgents = $userAgents ?: ['*'];
-        $this->allow = $allow;
-        $this->disallow = $disallow;
-        $this->sitemap = $sitemap;
+        $this->userAgents = array_map(self::sanitizeLine(...), $userAgents) ?: ['*'];
+        $this->allow = array_map(self::sanitizeLine(...), $allow);
+        $this->disallow = array_map(self::sanitizeLine(...), $disallow);
+        $this->sitemap = $sitemap === null ? null : self::sanitizeLine($sitemap);
     }
 
     /**
@@ -62,14 +62,14 @@ class Robots
      */
     public function disallow(array $paths): static
     {
-        $this->disallow = array_values(array_filter($paths));
+        $this->disallow = array_values(array_filter(array_map(self::sanitizeLine(...), $paths)));
 
         return $this;
     }
 
     public function sitemap(?string $url): static
     {
-        $this->sitemap = $url;
+        $this->sitemap = $url === null ? null : self::sanitizeLine($url);
 
         return $this;
     }
@@ -101,5 +101,17 @@ class Robots
     public function response(): Response
     {
         return response($this->toString(), 200, ['Content-Type' => 'text/plain']);
+    }
+
+    /**
+     * Cut a directive value at the first line break or control character so
+     * embedded payloads cannot inject additional directives. Everything after
+     * the first control character is discarded.
+     */
+    private static function sanitizeLine(string $value): string
+    {
+        $sanitized = preg_replace('/[\x00-\x1F\x7F].*$/s', '', trim($value));
+
+        return (string) $sanitized;
     }
 }

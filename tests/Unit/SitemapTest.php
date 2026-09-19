@@ -34,3 +34,31 @@ it('returns an application/xml response', function (): void {
     expect($response->getStatusCode())->toBe(200)
         ->and($response->headers->get('Content-Type'))->toBe('application/xml');
 });
+
+it('escapes XML-special characters in entries', function (): void {
+    $content = (new Sitemap)->response([
+        ['loc' => 'https://example.test/?a=1&b=2', 'lastmod' => '2026-01-02'],
+        ['loc' => 'https://example.test/<title>', 'changefreq' => '"daily" & \'monthly\''],
+    ])->getContent();
+
+    expect($content)->toContain('&amp;')
+        ->not->toContain('&b=2')
+        ->toContain('&lt;title&gt;')
+        ->toContain('&quot;daily&quot; &amp; &#039;monthly&#039;');
+});
+
+it('strips disallowed XML control characters from entries', function (): void {
+    $content = (new Sitemap)->response([
+        ['loc' => "https://example.test/\x00page", 'lastmod' => "2026-01-02\x0B"],
+    ])->getContent();
+
+    expect($content)->toContain('<loc>https://example.test/page</loc>')
+        ->toContain('<lastmod>2026-01-02</lastmod>');
+});
+
+it('rejects entries without a non-empty loc', function (): void {
+    expect(fn () => (new Sitemap)->response([['priority' => '1.0']]))
+        ->toThrow(InvalidArgumentException::class)
+        ->and(fn () => (new Sitemap)->response([['loc' => '']]))
+        ->toThrow(InvalidArgumentException::class);
+});

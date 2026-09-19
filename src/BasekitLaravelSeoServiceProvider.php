@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BasekitLaravel\BasekitLaravelSeo;
 
 use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 
 final class BasekitLaravelSeoServiceProvider extends ServiceProvider
@@ -15,6 +16,8 @@ final class BasekitLaravelSeoServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/basekit-laravel-seo.php', 'basekit-laravel-seo');
 
         $this->app->singleton(Sitemap::class, fn (): Sitemap => new Sitemap);
+
+        $this->app->scoped(SeoManager::class, fn (Container $app): SeoManager => new SeoManager($app));
     }
 
     public function boot(): void

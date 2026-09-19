@@ -40,3 +40,33 @@ it('returns a text/plain response', function (): void {
         ->and($response->headers->get('Content-Type'))->toBe('text/plain')
         ->and($response->getContent())->toContain('User-agent: *');
 });
+
+it('strips line breaks and control characters from directives', function (): void {
+    $robots = new Robots(
+        userAgents: ["*\r\nDisallow: /evil"],
+        allow: ["/\r\nSitemap: http://evil.test"],
+        disallow: ["/admin\nUser-agent: Googlebot"],
+        sitemap: "https://example.test/sitemap.xml\r\nSitemap: http://evil.test/sitemap.xml",
+    );
+
+    $content = $robots->toString();
+
+    expect($content)->not->toContain("\nDisallow: /evil")
+        ->not->toContain("\nSitemap: http://evil.test")
+        ->not->toContain('User-agent: Googlebot')
+        ->toContain('User-agent: *')
+        ->toContain('Disallow: /admin')
+        ->toContain('Sitemap: https://example.test/sitemap.xml');
+});
+
+it('sanitizes mutator input too', function (): void {
+    $robots = Robots::make()
+        ->disallow(["/private\r\nDisallow: /everything"])
+        ->sitemap("https://example.test/sitemap.xml\nDisallow: /admin");
+
+    $content = $robots->toString();
+
+    expect($content)->toContain('Disallow: /private')
+        ->not->toContain('Disallow: /everything')
+        ->not->toContain('Disallow: /admin'."\n");
+});

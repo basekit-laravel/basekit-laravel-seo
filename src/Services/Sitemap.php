@@ -6,13 +6,15 @@ namespace BasekitLaravel\BasekitLaravelSeo\Services;
 
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 /**
  * Renders an XML sitemap (urlset) from a list of URL descriptors.
  *
  * Each URL is an array with a `loc` plus optional `lastmod`, `changefreq` and
- * `priority`. The sitemap view lives in this package's view namespace so the
- * consuming site can override it by publishing the views.
+ * `priority`. Values are escaped by the sitemap view and disallowed XML control
+ * characters are stripped before rendering, so malicious or malformed input
+ * cannot corrupt the generated document.
  */
 class Sitemap
 {
@@ -31,7 +33,9 @@ class Sitemap
      */
     public function view(array $urls): View
     {
-        return view('basekit-laravel-seo::'.$this->view, ['urls' => $urls]);
+        return view('basekit-laravel-seo::'.$this->view, [
+            'urls' => array_map($this->normalizeEntry(...), $urls),
+        ]);
     }
 
     /**
@@ -42,5 +46,27 @@ class Sitemap
         return response($this->view($urls)->render(), 200, [
             'Content-Type' => 'application/xml',
         ]);
+    }
+
+    /**
+     * Validate an entry and strip disallowed XML control characters.
+     *
+     * @param  array<string, mixed>  $entry
+     * @return array<string, mixed>
+     */
+    private function normalizeEntry(array $entry): array
+    {
+        $loc = $entry['loc'] ?? null;
+
+        if (! is_scalar($loc) || (string) $loc === '') {
+            throw new InvalidArgumentException('Every sitemap entry must include a non-empty loc.');
+        }
+
+        return array_map(
+            static fn (mixed $value): mixed => is_string($value)
+                ? (string) preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $value)
+                : $value,
+            $entry,
+        );
     }
 }
