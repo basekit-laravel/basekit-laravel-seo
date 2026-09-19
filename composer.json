@@ -1,0 +1,72 @@
+{
+  "name": "basekit-laravel/basekit-laravel-seo",
+  "description": "Basekit Laravel SEO is a reusable, optional feature package for centralized metadata, structured data (JSON-LD), robots directives and XML sitemaps on Basekit-powered Laravel websites.",
+  "keywords": [
+    "laravel",
+    "basekit",
+    "seo",
+    "structured-data",
+    "json-ld",
+    "sitemap",
+    "robots"
+  ],
+  "homepage": "https://github.com/gergo-tar/basekit-laravel-seo",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Gergő Tar",
+      "email": "dev@gergotar.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.3|^8.4|^8.5",
+    "illuminate/contracts": "^13",
+    "illuminate/http": "^13",
+    "illuminate/support": "^13"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.17",
+    "larastan/larastan": "^3.8",
+    "mockery/mockery": "^1.6",
+    "nunomaduro/collision": "^8.9",
+    "orchestra/testbench": "11.*",
+    "pestphp/pest": "^5.0",
+    "pestphp/pest-plugin-laravel": "^5.0",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan-deprecation-rules": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BasekitLaravel\\BasekitLaravelSeo\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BasekitLaravel\\BasekitLaravelSeo\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "test-coverage": "vendor/bin/pest --coverage",
+    "format": "vendor/bin/pint",
+    "analyse": "vendor/bin/phpstan analyse",
+    "lint": "vendor/bin/pint --test"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "BasekitLaravel\\BasekitLaravelSeo\\BasekitLaravelSeoServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
