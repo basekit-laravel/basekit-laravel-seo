@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
-use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
-use BasekitLaravel\BasekitLaravelSeo\Services\SitemapAggregator;
-use BasekitLaravel\BasekitLaravelSeo\Support\SitemapEntry;
+use BasekitLaravel\BasekitLaravelSeo\Services\SitemapGenerator;
 use Illuminate\Http\Response;
 
 /**
- * Serves the aggregated sitemap. Aggregation and rendering stay separate: the
- * aggregator collects entries from the tagged providers and the Sitemap service
- * renders them through the published view.
+ * Serves the sitemap entry point.
+ *
+ * A catalog with a single document is served as a plain `<urlset>` (so small
+ * sites behave exactly as before); a split catalog becomes a `<sitemapindex>`.
+ * All decisions, rendering and origin resolution happen inside the generator
+ * in a single pass, so providers never run twice for one request.
  */
 final class SitemapController
 {
-    public function __invoke(SitemapAggregator $aggregator, Sitemap $sitemap): Response
+    public function __invoke(SitemapGenerator $generator): Response
     {
-        $entries = array_map(
-            static fn (SitemapEntry $entry): array => $entry->toArray(),
-            $aggregator->entries(),
-        );
-
-        return $sitemap->response($entries);
+        return response($generator->baseDocument(), 200, ['Content-Type' => 'application/xml']);
     }
 }

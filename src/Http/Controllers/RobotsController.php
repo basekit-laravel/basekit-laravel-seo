@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
 use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
-use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
+use BasekitLaravel\BasekitLaravelSeo\Services\SitemapPaths;
 use BasekitLaravel\BasekitLaravelSeo\Support\Robots;
 use Illuminate\Http\Response;
 
@@ -14,11 +14,11 @@ use Illuminate\Http\Response;
  *
  * A configured `robots.sitemap` is honored verbatim; otherwise the sitemap URL
  * is derived from the trusted canonical origin (never from a raw Host header),
- * keeping it in sync with the package's sitemap route.
+ * keeping it in sync with the package's configured sitemap route.
  */
 final class RobotsController
 {
-    public function __invoke(CanonicalUrlResolver $resolver): Response
+    public function __invoke(CanonicalUrlResolver $resolver, SitemapPaths $paths): Response
     {
         $config = (array) config('basekit-laravel-seo.robots', []);
 
@@ -28,7 +28,7 @@ final class RobotsController
             $origin = $resolver->resolve();
 
             if ($origin !== null) {
-                $sitemap = rtrim($origin->toString(), '/').Sitemap::ROUTE_PATH;
+                $sitemap = rtrim($origin->toString(), '/').$paths->base();
             }
         }
 

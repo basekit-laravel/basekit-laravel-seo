@@ -22,6 +22,7 @@ abstract class TestCase extends Orchestra
     {
         $app['config']->set('app.url', 'https://example.test');
         $app['config']->set('app.locale', 'en');
+        $app['config']->set('cache.default', 'array');
     }
 }
 

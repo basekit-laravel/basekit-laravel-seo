@@ -38,8 +38,10 @@ Sitemap: https://example.test/sitemap.xml
   order.
 - `sitemap`, when explicitly configured, is emitted as given.
 - When `sitemap` is `null`, the declaration is derived from the package's
-  trusted canonical origin (see below) plus the `/sitemap.xml` route path, so
-  the two always agree.
+  trusted canonical origin (see below) plus the sitemap route path, so the two
+  always agree. The path itself is configurable through
+  `basekit-laravel-seo.sitemap.path` (default `/sitemap.xml`); a split site
+  still only exports the entry point here.
 
 ## Sitemap declaration and host poisoning
 

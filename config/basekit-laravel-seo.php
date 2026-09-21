@@ -77,6 +77,39 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Sitemap scalability
+    |--------------------------------------------------------------------------
+    |
+    | `path` is the route the sitemap is served at; when splitting is required
+    | the additional documents are served at `<path minus .xml>-{n}.xml`
+    | (e.g. /sitemap-1.xml for the default path).
+    |
+    | `max_urls` and `max_bytes` are the document limits copied from the
+    | standard sitemap format (50,000 URLs / 50MB by default). Aggregate output
+    | is split at entry boundaries — never at an arbitrary byte position — so a
+    | single document is emitted while its URL count stays at or below
+    | `max_urls` and its rendered XML stays at or below `max_bytes`.
+    |
+    | `cache` holds the aggregated and split documents in the Laravel cache so
+    | providers are not re-executed on every request. `store` accepts a cache
+    | store name (null = the application's default store); `ttl` is in seconds.
+    | Clear the caches with `app(SitemapCache::class)->clear()`.
+    |
+    */
+
+    'sitemap' => [
+        'path' => env('BASEKIT_SEO_SITEMAP_PATH', '/sitemap.xml'),
+        'max_urls' => 50_000,
+        'max_bytes' => 50 * 1024 * 1024,
+        'cache' => [
+            'enabled' => (bool) env('BASEKIT_SEO_SITEMAP_CACHE', true),
+            'ttl' => 3600,
+            'store' => null,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | View configuration
     |--------------------------------------------------------------------------
     |
