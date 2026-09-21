@@ -107,7 +107,7 @@ When no safe base can be established, **no canonical URL is invented**.
 `title_suffix` is a rendering concern. `SeoData` never stores the formatted
 title; use `seo()->titleWithSuffix()` to get the final title with the suffix
 applied on demand. The suffix is not duplicated if the title already ends with
-it.
+it. The head component does this for you — see `docs/rendering.md`.
 
 ## URL safety
 

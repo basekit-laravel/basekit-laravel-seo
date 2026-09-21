@@ -6,6 +6,8 @@ use BasekitLaravel\BasekitLaravelSeo\SeoData;
 use BasekitLaravel\BasekitLaravelSeo\SeoManager;
 use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\WebPageSchema;
+use BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs\ContentPage;
+use BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs\ContentPageSeoResolver;
 
 it('provides the seo helper returning the shared manager', function (): void {
     expect(seo())->toBeInstanceOf(SeoManager::class)
@@ -125,6 +127,16 @@ it('keeps titles unchanged when no suffix is configured', function (): void {
     seo()->title('Plain title');
 
     expect(seo()->titleWithSuffix())->toBe('Plain title');
+});
+
+it('applies the suffix to a resolver-provided title', function (): void {
+    app()->tag(ContentPageSeoResolver::class, SeoManager::RESOLVER_TAG);
+    config()->set('basekit-laravel-seo.defaults.title_suffix', 'Basekit');
+
+    $page = new ContentPage('Resolver title', 'Description', 'https://example.test/pages/1');
+
+    expect(seo()->for($page)->titleWithSuffix())->toBe('Resolver title | Basekit')
+        ->and(seo()->data()->title)->toBe('Resolver title');
 });
 
 it('uses a safe canonical from the manager', function (): void {

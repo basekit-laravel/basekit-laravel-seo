@@ -148,13 +148,14 @@ final class SeoManager
      * The final resolved title with the configured suffix applied.
      *
      * The suffix is a rendering concern, so it is applied here on demand and
-     * never stored in SeoData.
+     * never stored in SeoData. The suffix is based on the resolved title (after
+     * the defaults → resolver → explicit merge), not just the explicit layer.
      */
     public function titleWithSuffix(string $separator = ' | '): ?string
     {
         $suffix = (string) config('basekit-laravel-seo.defaults.title_suffix', '');
 
-        return Title::withSuffix($this->explicit->title, $suffix, $separator);
+        return Title::withSuffix($this->data()->title, $suffix, $separator);
     }
 
     /**

@@ -17,6 +17,17 @@ namespace BasekitLaravel\BasekitLaravelSeo\Support;
 abstract class Schema
 {
     /**
+     * JSON encoding flags shared by every JSON-LD serialization.
+     *
+     * Slashes are left readable while angle brackets, ampersands and quotes are
+     * hex-escaped so untrusted strings can never terminate the surrounding
+     * <script> element. JSON_THROW_ON_ERROR surfaces malformed payloads loudly.
+     */
+    public const ENCODE_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        | JSON_THROW_ON_ERROR;
+
+    /**
      * The JSON-LD @type for this schema.
      */
     protected string $type = 'Thing';
@@ -57,12 +68,7 @@ abstract class Schema
 
     public function toJson(): string
     {
-        return json_encode(
-            $this->toArray(),
-            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-                | JSON_THROW_ON_ERROR,
-        );
+        return json_encode($this->toArray(), self::ENCODE_FLAGS);
     }
 
     public function render(): string

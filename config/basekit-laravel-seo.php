@@ -81,12 +81,14 @@ return [
     | The default views rendered by the package. Themes can override these by
     | publishing the package views (see README) or by pointing the view names
     | at their own Blade templates. When the `enabled` flag is on, the sitemap
-    | and robots routes use these views.
+    | and robots routes use the sitemap view and the `<x-basekit-laravel-seo::head />`
+    | component renders the `head` view.
     |
     */
 
     'views' => [
         'sitemap' => 'seo.sitemap',
+        'head' => 'basekit-laravel-seo::components.head',
     ],
 
 ];
