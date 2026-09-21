@@ -19,6 +19,12 @@ use InvalidArgumentException;
 class Sitemap
 {
     /**
+     * The route this package serves the sitemap at. The robots.txt sitemap
+     * declaration references the same path so the two always stay in sync.
+     */
+    public const ROUTE_PATH = '/sitemap.xml';
+
+    /**
      * The published sitemap view name, configurable via the package config.
      */
     protected string $view;

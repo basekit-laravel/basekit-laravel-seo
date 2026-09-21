@@ -62,7 +62,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | Default directives emitted by the Robots builder for the site's
-    | robots.txt. `disallow` is a list of URL paths to disallow.
+    | robots.txt. `disallow` is a list of URL paths to disallow. The `sitemap`
+    | declaration, when left null, is derived from the trusted canonical origin
+    | (see `canonical`) plus the package's `/sitemap.xml` route path.
     |
     */
 

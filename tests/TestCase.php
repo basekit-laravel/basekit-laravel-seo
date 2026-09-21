@@ -24,3 +24,18 @@ abstract class TestCase extends Orchestra
         $app['config']->set('app.locale', 'en');
     }
 }
+
+/**
+ * A trait that boots an otherwise-identical app with the package disabled, so
+ * the sitemap and robots routes are never registered at boot.
+ */
+trait DisablesSeo
+{
+    #[\Override]
+    protected function getEnvironmentSetUp($app): void
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('basekit-laravel-seo.enabled', false);
+    }
+}

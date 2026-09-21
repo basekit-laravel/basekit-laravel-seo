@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BasekitLaravel\BasekitLaravelSeo;
 
 use BasekitLaravel\BasekitLaravelSeo\Contracts\SeoResolver;
+use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
 use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\OpenGraph;
 use BasekitLaravel\BasekitLaravelSeo\Support\RobotsMeta;
@@ -255,42 +256,13 @@ final class SeoManager
     }
 
     /**
-     * Resolve the default canonical URL from config, app.url or a trusted
-     * request host. When no safe base can be established, none is invented.
+     * Resolve the default canonical URL through the shared trusted-origin
+     * resolver (config base_url, then app.url, then an allow-listed request
+     * host). When no safe base can be established, none is invented.
      */
     private function resolveDefaultCanonical(): ?CanonicalUrl
     {
-        $baseUrl = config('basekit-laravel-seo.canonical.base_url');
-        $base = is_string($baseUrl) && $baseUrl !== '' ? $baseUrl : (string) config('app.url', '');
-
-        if ($base !== '') {
-            $canonical = CanonicalUrl::tryFrom($base);
-
-            if ($canonical !== null) {
-                return $canonical;
-            }
-        }
-
-        if (! $this->container->bound('request')) {
-            return null;
-        }
-
-        $request = $this->container->make('request');
-
-        $host = strtolower((string) $request->getHost());
-
-        $trustedHosts = array_map(
-            'strtolower',
-            array_values((array) config('basekit-laravel-seo.canonical.trusted_hosts', [])),
-        );
-
-        if (! in_array($host, $trustedHosts, true)) {
-            return null;
-        }
-
-        $scheme = $request->isSecure() ? 'https' : 'http';
-
-        return CanonicalUrl::tryFrom($scheme.'://'.$host);
+        return $this->container->make(CanonicalUrlResolver::class)->resolve();
     }
 
     /**

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace BasekitLaravel\BasekitLaravelSeo;
 
 use BasekitLaravel\BasekitLaravelSeo\Components\Head;
+use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
 use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
+use BasekitLaravel\BasekitLaravelSeo\Services\SitemapAggregator;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -18,6 +20,8 @@ final class BasekitLaravelSeoServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/basekit-laravel-seo.php', 'basekit-laravel-seo');
 
         $this->app->singleton(Sitemap::class, fn (): Sitemap => new Sitemap);
+        $this->app->singleton(CanonicalUrlResolver::class);
+        $this->app->singleton(SitemapAggregator::class);
 
         $this->app->scoped(SeoManager::class, fn (Container $app): SeoManager => new SeoManager($app));
     }
@@ -37,5 +41,9 @@ final class BasekitLaravelSeoServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/basekit-laravel-seo.php' => config_path('basekit-laravel-seo.php'),
         ], 'basekit-laravel-seo-config');
+
+        if ((bool) config('basekit-laravel-seo.enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        }
     }
 }
