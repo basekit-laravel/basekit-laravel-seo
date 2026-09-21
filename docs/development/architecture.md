@@ -1,3 +1,13 @@
+---
+title: Architecture audit (maintainer)
+description: Internal review notes for the package architecture.
+---
+
+> **Maintainer context only.** This is an internal review document written early
+> in the package's life; some of its findings pre-date the current
+> implementation, so it is **not** an accurate description of the shipped code.
+> For the current behaviour, read the [Guide](../guide/getting-started).
+
 # Architecture Audit — basekit-laravel-seo
 
 > Status: **proposal — no code changes made**
@@ -303,7 +313,7 @@ A Blade component:
 
 ### 6.3 Safety
 
-Every value passed through Blade `{{ }}` / attribute escaping; assets/URLs validated during
+Every value passed through Blade output escaping / attribute escaping; assets/URLs validated during
 resolution (§10); JSON-LD hardening in §7.4/§15. The component is stateless and safe to render
 multiple times.
 
@@ -409,7 +419,8 @@ final readonly class SitemapEntry
 - **Caching**: render cost is cheap; *aggregation cost is not* (DB queries). Cache the rendered
   sitemap (or the resolved entry list) keyed by provider set + fingerprint, TTL from config, using
   the app cache store — **off by default**, enabled per environment. Cache tags if the app uses them.
-- **XML escaping**: use an XML-aware escaper or `XMLWriter`; `{{ }}` (HTML entity escaping) is
+- **XML escaping**: use an XML-aware escaper or `XMLWriter`; Blade's double-brace escaping
+  is
   close but not identical for XML text nodes — pin it with tests rather than assume (see §15).
 - **Empty input**: render a valid empty `<urlset>` (tests assert well-formedness).
 - **`lastmod`**: normalize to ISO-8601; accept `DateTimeInterface`/`CarbonInterface`/string.
@@ -548,7 +559,7 @@ cheap (defer DB hits to `for()` only when invoked).
 | # | Finding | Severity | Location |
 |---|---|---|---|
 | S1 | JSON-LD `render()` doesn't neutralize `</script>` (`JSON_UNESCAPED_SLASHES` w/o `JSON_HEX_TAG`) — user-supplied strings can break out of the script block | **Major** | `Schema::toJson()` |
-| S2 | Sitemap uses `{{ }}` (HTML entity escaping) for XML text nodes — works in practice for `&<>\'"`, but is unverified; needs explicit XML escaping or `XMLWriter` + tests | Minor | `seo/sitemap.blade.php` |
+| S2 | Sitemap uses Blade's double-brace escaping (HTML entity escaping) for XML text nodes — works in practice for `&<>\'"`, but is unverified; needs explicit XML escaping or `XMLWriter` + tests | Minor | `seo/sitemap.blade.php` |
 | S3 | No canonical/URL trust handling exists (nothing to fix yet, but the *absence* is the risk once metadata rendering lands) | — | n/a |
 | S4 | Robots paths are emitted verbatim — a `\n` in a config/path value would inject fake directives | Minor | `Robots::toString()` |
 
@@ -557,7 +568,7 @@ must be fixed **as part of** the P0 rendering work, not after.
 
 ### 15.2 Target guarantees
 
-- **Escaping:** all head tags via Blade `{{ }}`/attribute escaping; JSON-LD via `JSON_HEX_TAG` +
+- **Escaping:** all head tags via Blade escaping/attribute escaping; JSON-LD via `JSON_HEX_TAG` +
   `JSON_UNESCAPED_UNICODE`; sitemap via XML-aware escaper; robots via single-line sanitization.
 - **URLs:** scheme whitelist, no userinfo/fragments, trusted base only (§10).
 - **Host headers:** package never trusts `Host`/`X-Forwarded-Host` for generation.
@@ -768,4 +779,4 @@ outside Illuminate. The integration points are exactly three contracts/resolvers
 4. **P3 — Future/optional:** admin/UI surface for editing SEO, advanced caches, more schema
    primitives as ecosystem demand proves them.
 
-For the prioritized backlog see `docs/FEATURE_ROADMAP.md`.
+For the prioritized backlog see [Feature roadmap](./feature-roadmap).

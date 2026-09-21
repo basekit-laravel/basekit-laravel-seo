@@ -1,6 +1,15 @@
+---
+title: Feature roadmap (maintainer)
+description: Internal planning document. Not a list of implemented features.
+---
+
+> **Maintainer context only.** This is an internal planning document — nothing
+> here is implemented just because it is listed. For what the package actually
+> does, read the [Guide](../guide/getting-started).
+
 # Feature Roadmap — basekit-laravel-seo
 
-> Companion to `docs/ARCHITECTURE_AUDIT.md`. Nothing here is implemented yet.
+> Companion to [Architecture audit](./architecture). Nothing here is implemented yet.
 > Prioritisation: **P0** foundations, **P1** core functionality, **P2** useful improvements,
 > **P3** future/optional.
 > Every item explains *why it belongs in this package* and why it is at that level.

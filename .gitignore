@@ -28,3 +28,8 @@ Thumbs.db
 
 # Package specific
 *.backup
+
+# Docs site (VitePress)
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
+/docs/node_modules/
