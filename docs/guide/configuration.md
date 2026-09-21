@@ -54,9 +54,8 @@ return [
         ],
     ],
 
-    // The Blade views the package renders with.
+    // The head view rendered by the head component.
     'views' => [
-        'sitemap' => 'seo.sitemap',
         'head' => 'basekit-laravel-seo::components.head',
     ],
 ];

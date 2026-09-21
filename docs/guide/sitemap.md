@@ -92,20 +92,3 @@ use BasekitLaravel\BasekitLaravelSeo\Services\SitemapCache;
 
 app(SitemapCache::class)->clear();
 ```
-
-### Legacy API
-
-The older `Services\Sitemap` class still renders a list of URL arrays through
-the published sitemap view:
-
-```php
-use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
-
-$response = (new Sitemap)->response([
-    ['loc' => 'https://acme.test/about', 'lastmod' => '2026-09-21'],
-]);
-```
-
-The automated `/sitemap.xml` route does **not** use this API — it uses the
-built-in renderer so splitting, the index and byte accounting stay exact. The
-legacy API is for you to render the same view manually.

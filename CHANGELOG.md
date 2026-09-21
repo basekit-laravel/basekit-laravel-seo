@@ -39,7 +39,7 @@ numbers start when the first release is tagged.
 - **XML sitemap** — `SitemapProvider` contract (`entries(): iterable`) tagged
   with `basekit-laravel-seo.sitemap-providers`; `SitemapEntry` value object
   with validated `loc`, `lastmod`, `changefreq` and `priority`; `/sitemap.xml`
-  route; legacy `Services\Sitemap` API rendering through the published view.
+  route.
 - **Sitemap splitting and index** — aggregate output split at entry boundaries
   by `max_urls` (default 50,000) and `max_bytes` (default 50 MB, exact UTF-8
   byte accounting); split sites serve a `<sitemapindex>` plus deterministic

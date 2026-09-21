@@ -17,6 +17,13 @@ use InvalidArgumentException;
  */
 final class SitemapPaths
 {
+    /**
+     * The route the package serves the sitemap at when no path is configured.
+     * The robots.txt sitemap declaration references the same path so the two
+     * always stay in sync.
+     */
+    public const DEFAULT_PATH = '/sitemap.xml';
+
     public function __construct(private readonly string $base)
     {
         if (trim($base) === '') {
@@ -26,7 +33,7 @@ final class SitemapPaths
 
     public static function fromConfig(): self
     {
-        return new self((string) config('basekit-laravel-seo.sitemap.path', Sitemap::ROUTE_PATH));
+        return new self((string) config('basekit-laravel-seo.sitemap.path', self::DEFAULT_PATH));
     }
 
     /**

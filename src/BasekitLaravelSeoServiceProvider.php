@@ -6,7 +6,6 @@ namespace BasekitLaravel\BasekitLaravelSeo;
 
 use BasekitLaravel\BasekitLaravelSeo\Components\Head;
 use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
-use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapAggregator;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapCache;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapChunker;
@@ -24,7 +23,6 @@ final class BasekitLaravelSeoServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/basekit-laravel-seo.php', 'basekit-laravel-seo');
 
-        $this->app->singleton(Sitemap::class, fn (): Sitemap => new Sitemap);
         $this->app->singleton(CanonicalUrlResolver::class);
         $this->app->singleton(SitemapAggregator::class);
 

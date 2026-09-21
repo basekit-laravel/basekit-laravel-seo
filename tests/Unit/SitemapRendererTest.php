@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use BasekitLaravel\BasekitLaravelSeo\Services\Sitemap;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapPaths;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapRenderer;
 use BasekitLaravel\BasekitLaravelSeo\Support\SitemapCatalog;
@@ -39,19 +38,14 @@ it('renders a urlset with the XML declaration and sitemap namespace', function (
         ->toContain('<loc>https://example.test/about</loc>');
 });
 
-it('renders the same urlset content as the legacy Sitemap view', function (): void {
-    $entries = [
+it('renders optional fields only when present and defaults priority to 0.5', function (): void {
+    $rendered = renderer_under_test()->urlset([
         new SitemapEntry(loc: 'https://example.test/about', lastmod: '2026-09-21T10:30:00+00:00', changefreq: 'monthly', priority: 0.8),
         new SitemapEntry(loc: 'https://example.test/products/bar', priority: 1.0),
         new SitemapEntry(loc: 'https://example.test/empty'),
-    ];
+    ]);
 
-    $rendered = renderer_under_test()->urlset($entries);
-
-    $legacy = (new Sitemap)->view(array_map(static fn (SitemapEntry $entry): array => $entry->toArray(), $entries))->render();
-
-    expect(renderer_locs($rendered))->toBe(renderer_locs($legacy))
-        ->and($rendered)->toContain('<lastmod>2026-09-21T10:30:00+00:00</lastmod>')
+    expect($rendered)->toContain('<lastmod>2026-09-21T10:30:00+00:00</lastmod>')
         ->toContain('<changefreq>monthly</changefreq>')
         ->toContain('<priority>0.8</priority>')
         ->toContain('<priority>1</priority>')

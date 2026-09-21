@@ -15,8 +15,8 @@ Publish the configuration file so you can adjust it:
 php artisan vendor:publish --tag="basekit-laravel-seo-config"
 ```
 
-Optionally publish the Blade views (head component, partials, sitemap view)
-when you want to customize them:
+Optionally publish the Blade views (head component and partials) when you want
+to customize them:
 
 ```bash
 php artisan vendor:publish --tag="basekit-laravel-seo-views"
