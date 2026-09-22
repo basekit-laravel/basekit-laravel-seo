@@ -28,7 +28,7 @@ design snippets are illustrative and are not part of the package yet.
 - No `README.md`, no `LICENSE`, no `CHANGELOG`, no `docs/`, no GitHub Actions workflow, no
   `pint.json` (Pint runs with its defaults).
 - `routes/`, `database/migrations/`, `tests/Feature/`, `tests/TestSupport/` exist but are empty.
-- Composer: `basekit-laravel/basekit-laravel-seo`, MIT, PHP `^8.3|^8.4|^8.5`, Laravel `^13`.
+- Composer: `basekit-laravel/basekit-laravel-seo`, MIT, PHP `^8.4|^8.5`, Laravel `^13`.
 
 ### 1.2 Runtime dependencies
 
@@ -187,7 +187,7 @@ of this object.
 
 ### 4.1 Recommended design
 
-`final readonly class SeoData` (PHP 8.3 `readonly`), created by named constructors/withers. The
+`final readonly class SeoData` (PHP `readonly`), created by named constructors/withers. The
 builder/facade (`seo()`) is a separate *mutable* draft that resolves through the pipeline and
 freezes into an immutable `SeoData`.
 

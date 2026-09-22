@@ -2,7 +2,7 @@
 
 This package provides Basekit Laravel SEO is a reusable, optional feature package for centralized metadata, structured data (JSON-LD), robots directives and XML sitemaps on Basekit-powered Laravel websites..
 
-It targets PHP ^8.3|^8.4|^8.5 and Laravel ^13 and is distributed on Composer as
+It targets PHP ^8.4|^8.5 and Laravel ^13 and is distributed on Composer as
 `basekit-laravel/basekit-laravel-seo`. All package source code lives under the `BasekitLaravel\BasekitLaravelSeo` namespace.
 
 ## What this project is
@@ -87,7 +87,7 @@ perspective where appropriate instead of asserting implementation details.
 
 ## Compatibility
 
-- Respect the Composer constraints in `composer.json`: PHP ^8.3|^8.4|^8.5 and Laravel
+- Respect the Composer constraints in `composer.json`: PHP ^8.4|^8.5 and Laravel
   ^13. Do not introduce syntax, APIs, or dependencies that break the declared
   minimum versions.
 - Classify dependencies correctly in `composer.json`: runtime needs go into `require`;

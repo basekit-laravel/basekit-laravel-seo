@@ -70,7 +70,7 @@ final readonly class SeoData implements Arrayable, JsonSerializable
             $schemas[] = $value;
         }
 
-        return new static(
+        return new self(
             title: isset($data['title']) ? (string) $data['title'] : null,
             description: isset($data['description']) ? (string) $data['description'] : null,
             canonicalUrl: isset($data['canonical_url']) ? CanonicalUrl::from((string) $data['canonical_url']) : (isset($data['canonicalUrl']) ? CanonicalUrl::from((string) $data['canonicalUrl']) : null),
@@ -219,7 +219,7 @@ final readonly class SeoData implements Arrayable, JsonSerializable
      */
     private function with(array $changes): static
     {
-        return new static(
+        return new self(
             title: array_key_exists('title', $changes) ? $this->nullableString($changes['title']) : $this->title,
             description: array_key_exists('description', $changes) ? $this->nullableString($changes['description']) : $this->description,
             canonicalUrl: $this->coerceCanonicalUrl(array_key_exists('canonicalUrl', $changes) ? $changes['canonicalUrl'] : $this->canonicalUrl),

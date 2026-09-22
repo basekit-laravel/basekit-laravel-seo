@@ -8,7 +8,7 @@ compatibility: opencode
 # Laravel Package Conventions
 
 Use this skill any time you write Laravel code in this repository
-(`basekit-laravel-seo`, PHP ^8.3|^8.4|^8.5, Laravel ^13).
+(`basekit-laravel-seo`, PHP ^8.4|^8.5, Laravel ^13).
 
 ## Laravel application vs Laravel package
 

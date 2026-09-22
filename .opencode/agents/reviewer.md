@@ -16,7 +16,7 @@ the current changes and report findings, and you never modify files.
 
 - **Architecture**: consistent with the package structure and conventions.
 - **Public API**: no unnecessary API surface; documented and stable public behaviour.
-- **Compatibility**: no breakage of supported PHP ^8.3|^8.4|^8.5 or Laravel ^13.
+- **Compatibility**: no breakage of supported PHP ^8.4|^8.5 or Laravel ^13.
 - **Composer**: dependencies correctly classified and justified.
 - **Laravel integration**: package discovery, service provider, config/routes/views loading.
 - **Database**: migrations safe; indexes/constraints appropriate.

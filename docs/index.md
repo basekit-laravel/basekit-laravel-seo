@@ -34,7 +34,7 @@ Nothing is guessed: the package only emits values you (or a resolver) provide.
 
 ## Requirements
 
-PHP `^8.3|^8.4|^8.5` and Laravel `^13`.
+PHP `^8.4|^8.5` and Laravel `^13`.
 
 ## What this package does not do
 

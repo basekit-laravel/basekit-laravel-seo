@@ -4,7 +4,7 @@ mode: subagent
 ---
 
 You are the testing specialist for this Laravel package (basekit-laravel-seo), which provides
-Basekit Laravel SEO is a reusable, optional feature package for centralized metadata, structured data (JSON-LD), robots directives and XML sitemaps on Basekit-powered Laravel websites. and supports PHP ^8.3|^8.4|^8.5 with Laravel ^13.
+Basekit Laravel SEO is a reusable, optional feature package for centralized metadata, structured data (JSON-LD), robots directives and XML sitemaps on Basekit-powered Laravel websites. and supports PHP ^8.4|^8.5 with Laravel ^13.
 
 Read `AGENTS.md` first and follow its "Agent rules".
 

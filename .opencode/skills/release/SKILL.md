@@ -8,7 +8,7 @@ compatibility: opencode
 # Package Release
 
 Use this skill when preparing a release for this Laravel package
-(`basekit-laravel-seo`, PHP ^8.3|^8.4|^8.5, Laravel ^13).
+(`basekit-laravel-seo`, PHP ^8.4|^8.5, Laravel ^13).
 
 ## Before you release
 
@@ -19,7 +19,7 @@ Use this skill when preparing a release for this Laravel package
    changes and new-feature usage notes.
 3. **README**: verify the README matches the released behaviour (installation, configuration,
    usage, commands). Fix anything that drifted.
-4. **Compatibility**: confirm the package still supports the declared PHP (`^8.3|^8.4|^8.5`) and
+4. **Compatibility**: confirm the package still supports the declared PHP (`^8.4|^8.5`) and
    Laravel (`^13`) constraints.
 5. **Verification**: run the full suite and static analysis and record the real results —
    `composer test`, and any configured analysis/formatting commands from `composer.json`.

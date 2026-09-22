@@ -8,13 +8,13 @@ compatibility: opencode
 # Package Code Review
 
 Use this skill when reviewing changes to this Laravel package
-(`basekit-laravel-seo`, PHP ^8.3|^8.4|^8.5, Laravel ^13).
+(`basekit-laravel-seo`, PHP ^8.4|^8.5, Laravel ^13).
 
 ## Checklist
 
 - **Architecture**: consistent with the package structure and existing patterns; minimal scope.
 - **Public API**: no unnecessary new API surface; public behaviour is documented and stable.
-- **Compatibility**: within supported PHP `^8.3|^8.4|^8.5` and Laravel `^13`;
+- **Compatibility**: within supported PHP `^8.4|^8.5` and Laravel `^13`;
   no use of host-app scaffolding; no breaking behaviour change.
 - **Composer**: dependencies justified and classified (`require` vs `require-dev`).
 - **Laravel integration**: package discovery and provider registration correct; config/views/

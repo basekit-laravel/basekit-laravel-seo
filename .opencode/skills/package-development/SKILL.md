@@ -8,7 +8,7 @@ compatibility: opencode
 # Laravel Package Development
 
 Use this skill when implementing or changing any part of this Laravel package
-(`basekit-laravel-seo`, PHP ^8.3|^8.4|^8.5, Laravel ^13).
+(`basekit-laravel-seo`, PHP ^8.4|^8.5, Laravel ^13).
 
 ## Core principles
 
@@ -30,7 +30,7 @@ Use this skill when implementing or changing any part of this Laravel package
 ## Composer
 
 - Runtime dependencies go in `require`; development tooling in `require-dev`.
-- Respect the declared minimum PHP (`^8.3|^8.4|^8.5`) and Laravel (`^13`).
+- Respect the declared minimum PHP (`^8.4|^8.5`) and Laravel (`^13`).
 - Prefer small, well-maintained dependencies; avoid a dependency when stdlib or Illuminate code
   suffices.
 - Optional integrations belong in separate packages or service-provider checks, never in the

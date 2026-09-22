@@ -10,7 +10,7 @@ Laravel application that installs it.
 
 | Component | Constraint |
 | --- | --- |
-| PHP | `^8.3`, `^8.4` or `^8.5` |
+| PHP | `^8.4` or `^8.5` |
 | Laravel | `^13` |
 
 ## Features

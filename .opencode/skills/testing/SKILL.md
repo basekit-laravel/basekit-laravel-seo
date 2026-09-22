@@ -8,7 +8,7 @@ compatibility: opencode
 # Package Testing
 
 Use this skill when writing or running tests for this Laravel package
-(`basekit-laravel-seo`, PHP ^8.3|^8.4|^8.5, Laravel ^13).
+(`basekit-laravel-seo`, PHP ^8.4|^8.5, Laravel ^13).
 
 ## Pest + Orchestra Testbench
 
