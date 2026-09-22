@@ -42,6 +42,9 @@ Until you set metadata, it renders nothing — no invented tags.
 Use the `seo()` helper from a controller:
 
 ```php
+use App\Models\Article;
+use BasekitLaravel\BasekitLaravelSeo\Support\ArticleSchema;
+
 public function show(Article $article)
 {
     seo()

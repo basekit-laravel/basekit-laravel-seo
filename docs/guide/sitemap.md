@@ -71,7 +71,11 @@ public function register(): void
   the documents are served at `/sitemap-1.xml`, `/sitemap-2.xml`, ...
 - **Drops duplicates** by URL (first occurrence wins).
 - **Fails loudly.** A provider that throws or yields something that is not a
-  `SitemapEntry` surfaces its error — no partial sitemap is served.
+  `SitemapEntry` surfaces its error — no partial sitemap is served. A single
+  entry too large to fit in one document raises `InvalidArgumentException`.
+- **Missing chunks are 404.** A request for a chunk that does not exist (for
+  example `/sitemap-99.xml` when only two documents were generated) returns
+  `404` instead of an empty document.
 
 ### Caching
 
