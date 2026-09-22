@@ -36,7 +36,6 @@ return [
         'og_image' => null,
         'twitter_card' => 'summary_large_image',
         'locale' => 'en',
-        'url' => null,
     ],
 
     /*

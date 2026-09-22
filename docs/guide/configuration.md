@@ -24,7 +24,6 @@ return [
         'og_image' => null,         // default og:image (validated; dropped if unsafe)
         'twitter_card' => 'summary_large_image',
         'locale' => 'en',
-        'url' => null,
     ],
 
     // Where the default canonical URL comes from.
