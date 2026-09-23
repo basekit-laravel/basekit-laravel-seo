@@ -6,10 +6,11 @@ namespace BasekitLaravel\BasekitLaravelSeo\Tests;
 
 use BasekitLaravel\BasekitLaravelSeo\BasekitLaravelSeoServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Override;
 
 abstract class TestCase extends Orchestra
 {
-    #[\Override]
+    #[Override]
     protected function getPackageProviders($app): array
     {
         return [
@@ -17,7 +18,7 @@ abstract class TestCase extends Orchestra
         ];
     }
 
-    #[\Override]
+    #[Override]
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('app.url', 'https://example.test');
@@ -32,7 +33,7 @@ abstract class TestCase extends Orchestra
  */
 trait DisablesSeo
 {
-    #[\Override]
+    #[Override]
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);

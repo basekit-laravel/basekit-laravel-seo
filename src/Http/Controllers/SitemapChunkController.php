@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapGenerator;
+use BasekitLaravel\BasekitLaravelSeo\Support\SitemapDocument;
 use Illuminate\Http\Response;
 
 /**
@@ -18,7 +19,7 @@ final class SitemapChunkController
     {
         $index = (int) $n;
 
-        if ($index < 1 || $generator->catalog()->document($index) === null) {
+        if ($index < 1 || ! $generator->catalog()->document($index) instanceof SitemapDocument) {
             abort(404);
         }
 

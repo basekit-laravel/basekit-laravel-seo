@@ -14,13 +14,13 @@ use Stringable;
  */
 final readonly class TwitterMeta implements Stringable
 {
-    public const CARD_SUMMARY = 'summary';
+    public const string CARD_SUMMARY = 'summary';
 
-    public const CARD_SUMMARY_LARGE_IMAGE = 'summary_large_image';
+    public const string CARD_SUMMARY_LARGE_IMAGE = 'summary_large_image';
 
-    public const CARD_APP = 'app';
+    public const string CARD_APP = 'app';
 
-    public const CARD_PLAYER = 'player';
+    public const string CARD_PLAYER = 'player';
 
     public function __construct(
         public ?string $card = self::CARD_SUMMARY_LARGE_IMAGE,
@@ -50,7 +50,7 @@ final readonly class TwitterMeta implements Stringable
         );
 
         if (isset($data['image'])) {
-            $object = $object->withImage((string) $data['image']);
+            return $object->withImage((string) $data['image']);
         }
 
         return $object;

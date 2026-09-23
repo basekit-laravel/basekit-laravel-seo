@@ -23,8 +23,8 @@ it('omits unset values from the array', function (): void {
 });
 
 it('validates image and url against canonical URL safety rules', function (string $url): void {
-    expect(fn () => OpenGraph::make()->withImage($url))->toThrow(InvalidArgumentException::class)
-        ->and(fn () => OpenGraph::make()->withUrl($url))->toThrow(InvalidArgumentException::class);
+    expect(fn (): OpenGraph => OpenGraph::make()->withImage($url))->toThrow(InvalidArgumentException::class)
+        ->and(fn (): OpenGraph => OpenGraph::make()->withUrl($url))->toThrow(InvalidArgumentException::class);
 })->with([
     'javascript' => 'javascript:alert(1)',
     'data' => 'data:image/png;base64,iVBOR',

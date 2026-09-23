@@ -23,17 +23,17 @@ use InvalidArgumentException;
  * pass-through (every read misses, every write is a no-op) and the sitemap is
  * simply regenerated per request.
  */
-final class SitemapCache
+final readonly class SitemapCache
 {
-    public const CACHE_VERSION = 1;
+    public const int CACHE_VERSION = 1;
 
-    public const KEY_PREFIX = 'basekit-laravel-seo:sitemap:v1';
+    public const string KEY_PREFIX = 'basekit-laravel-seo:sitemap:v1';
 
-    private const KEY_INDEX = self::KEY_PREFIX.':index';
+    private const string KEY_INDEX = self::KEY_PREFIX.':index';
 
-    private const KEY_REGISTRY = self::KEY_PREFIX.':keys';
+    private const string KEY_REGISTRY = self::KEY_PREFIX.':keys';
 
-    public function __construct(private readonly CacheManager $cache) {}
+    public function __construct(private CacheManager $cache) {}
 
     /**
      * The cached catalog, or null on a miss or when caching is disabled.
@@ -80,7 +80,7 @@ final class SitemapCache
             return null;
         }
 
-        $content = $this->store()->get(self::documentKey($index));
+        $content = $this->store()->get($this->documentKey($index));
 
         return is_string($content) ? $content : null;
     }
@@ -94,9 +94,9 @@ final class SitemapCache
             return;
         }
 
-        $this->store()->put(self::documentKey($index), $xml, $this->ttl());
+        $this->store()->put($this->documentKey($index), $xml, $this->ttl());
 
-        $this->register(self::documentKey($index));
+        $this->register($this->documentKey($index));
     }
 
     /**
@@ -124,7 +124,7 @@ final class SitemapCache
         $this->store()->forget(self::KEY_REGISTRY);
     }
 
-    private static function documentKey(int $index): string
+    private function documentKey(int $index): string
     {
         return self::KEY_PREFIX.':'.$index;
     }

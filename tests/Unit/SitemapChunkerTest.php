@@ -56,7 +56,7 @@ it('produces a single empty document for an empty site', function (): void {
     $slices = chunk_slices($chunker, []);
 
     expect($slices)->toBe([1 => []])
-        ->and($chunker->chunk([], static fn () => null)->count())->toBe(1);
+        ->and($chunker->chunk([], static fn (): null => null)->count())->toBe(1);
 });
 
 it('splits by URL count at the protocol boundaries', function (): void {
@@ -98,8 +98,8 @@ it('fits entries at the exact byte boundary and splits beyond it', function (): 
     $exactFit = $renderer->scaffoldBytes() + $renderer->entryBytes($a) + $renderer->entryBytes($b) + $renderer->entryBytes($c);
     $fitsTwo = $renderer->scaffoldBytes() + $renderer->entryBytes($a) + $renderer->entryBytes($b);
 
-    expect((new SitemapChunker($renderer, 50_000, $exactFit))->chunk([$a, $b, $c], static fn () => null)->count())->toBe(1)
-        ->and((new SitemapChunker($renderer, 50_000, $fitsTwo))->chunk([$a, $b, $c], static fn () => null)->count())->toBe(2);
+    expect(new SitemapChunker($renderer, 50_000, $exactFit)->chunk([$a, $b, $c], static fn (): null => null)->count())->toBe(1)
+        ->and(new SitemapChunker($renderer, 50_000, $fitsTwo)->chunk([$a, $b, $c], static fn (): null => null)->count())->toBe(2);
 });
 
 it('splits multibyte locations by their byte length, not character count', function (): void {
@@ -111,9 +111,9 @@ it('splits multibyte locations by their byte length, not character count', funct
 
     $budget = $renderer->scaffoldBytes() + $renderer->entryBytes($asciiA) + $renderer->entryBytes($asciiB);
 
-    expect((new SitemapChunker($renderer, 50_000, $budget))->chunk([$asciiA, $asciiB], static fn () => null)->count())->toBe(1)
+    expect(new SitemapChunker($renderer, 50_000, $budget)->chunk([$asciiA, $asciiB], static fn (): null => null)->count())->toBe(1)
         ->and($renderer->entryBytes($heavy))->toBe($renderer->entryBytes($asciiB) + 3)
-        ->and((new SitemapChunker($renderer, 50_000, $budget))->chunk([$asciiA, $heavy], static fn () => null)->count())->toBe(2);
+        ->and(new SitemapChunker($renderer, 50_000, $budget)->chunk([$asciiA, $heavy], static fn (): null => null)->count())->toBe(2);
 });
 
 it('records byte sizes that match the actual rendered chunk bytes', function (): void {
@@ -128,7 +128,7 @@ it('records byte sizes that match the actual rendered chunk bytes', function ():
     $maxBytes = $renderer->scaffoldBytes() + 2 * $renderer->entryBytes($entries[0]) + 3;
 
     $slices = chunk_slices(new SitemapChunker($renderer, 50_000, $maxBytes), $entries);
-    $catalog = (new SitemapChunker($renderer, 50_000, $maxBytes))->chunk($entries, static fn () => null);
+    $catalog = new SitemapChunker($renderer, 50_000, $maxBytes)->chunk($entries, static fn (): null => null);
 
     foreach ($catalog->documents() as $document) {
         expect($document->bytes)->toBe(strlen($renderer->urlset($slices[$document->index])))
@@ -143,16 +143,16 @@ it('throws a meaningful exception when a single entry exceeds the document size'
 
     $oversized = new SitemapEntry(loc: 'https://example.test/'.str_repeat('a', 1000));
 
-    expect(fn () => (new SitemapChunker($renderer, 50_000, $maxBytes))->chunk([$oversized], static fn () => null))
+    expect(fn (): SitemapCatalog => new SitemapChunker($renderer, 50_000, $maxBytes)->chunk([$oversized], static fn (): null => null))
         ->toThrow(InvalidArgumentException::class, 'exceeds the configured maximum sitemap document size');
 });
 
 it('rejects invalid limits', function (): void {
     $renderer = chunker_renderer();
 
-    expect(fn () => new SitemapChunker($renderer, 0, 50 * 1024 * 1024))
+    expect(fn (): SitemapChunker => new SitemapChunker($renderer, 0, 50 * 1024 * 1024))
         ->toThrow(InvalidArgumentException::class)
-        ->and(fn () => new SitemapChunker($renderer, 1, $renderer->scaffoldBytes() - 1))
+        ->and(fn (): SitemapChunker => new SitemapChunker($renderer, 1, $renderer->scaffoldBytes() - 1))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -161,7 +161,7 @@ it('exposes document lookup and index detection on the catalog', function (): vo
 
     $entries = array_map(static fn (int $i): SitemapEntry => new SitemapEntry('https://example.test/pages/'.$i), range(1, 5));
 
-    $catalog = (new SitemapChunker($renderer, 2, PHP_INT_MAX))->chunk($entries, static fn () => null);
+    $catalog = new SitemapChunker($renderer, 2, PHP_INT_MAX)->chunk($entries, static fn (): null => null);
 
     expect($catalog->isIndex())->toBeTrue()
         ->and($catalog->count())->toBe(3)
@@ -176,7 +176,7 @@ it('round-trips the catalog and its documents through arrays', function (): void
 
     $entries = array_map(static fn (int $i): SitemapEntry => new SitemapEntry('https://example.test/pages/'.$i), range(1, 3));
 
-    $catalog = (new SitemapChunker($renderer, 2, PHP_INT_MAX))->chunk($entries, static fn () => null);
+    $catalog = new SitemapChunker($renderer, 2, PHP_INT_MAX)->chunk($entries, static fn (): null => null);
 
     $restored = SitemapCatalog::fromArray($catalog->toArray());
 

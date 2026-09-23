@@ -17,9 +17,9 @@ use InvalidArgumentException;
  * dropped. Provider failures are never swallowed — a partial sitemap is worse
  * than an explicit failure, so exceptions propagate to the caller.
  */
-final class SitemapAggregator
+final readonly class SitemapAggregator
 {
-    public function __construct(private readonly Container $container) {}
+    public function __construct(private Container $container) {}
 
     /**
      * @return list<SitemapEntry>

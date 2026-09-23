@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Support;
 
+use Override;
+
 /**
  * JSON-LD WebPage schema.
  */
@@ -66,7 +68,7 @@ class WebPageSchema extends Schema
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     protected function attributes(): array
     {
         return $this->data;

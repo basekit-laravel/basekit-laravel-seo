@@ -24,7 +24,7 @@ it('normalizes the host to lowercase and strips the default port', function (): 
 });
 
 it('rejects unsupported URL schemes', function (string $loc): void {
-    expect(fn () => new SitemapEntry(loc: $loc))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: $loc))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'javascript:' => 'javascript:alert(1)',
@@ -35,7 +35,7 @@ it('rejects unsupported URL schemes', function (string $loc): void {
 ]);
 
 it('rejects empty and malformed locations', function (string $loc): void {
-    expect(fn () => new SitemapEntry(loc: $loc))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: $loc))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'empty' => '',
@@ -45,7 +45,7 @@ it('rejects empty and malformed locations', function (string $loc): void {
 ]);
 
 it('rejects control characters and line breaks in the location', function (string $loc): void {
-    expect(fn () => new SitemapEntry(loc: $loc))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: $loc))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'null byte' => "https://example.test/\x00page",
@@ -55,7 +55,7 @@ it('rejects control characters and line breaks in the location', function (strin
 ]);
 
 it('rejects fragments and credentials in the location', function (string $loc): void {
-    expect(fn () => new SitemapEntry(loc: $loc))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: $loc))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'fragment' => 'https://example.test/page#section',
@@ -86,7 +86,7 @@ it('accepts a DateTimeInterface lastmod', function (): void {
 });
 
 it('rejects an unparseable lastmod', function (): void {
-    expect(fn () => new SitemapEntry(loc: 'https://example.test/', lastmod: 'not-a-date'))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: 'https://example.test/', lastmod: 'not-a-date'))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -106,7 +106,7 @@ it('accepts every standard changefreq value case-insensitively', function (strin
 ]);
 
 it('rejects an unknown changefreq', function (): void {
-    expect(fn () => new SitemapEntry(loc: 'https://example.test/', changefreq: 'sometimes'))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: 'https://example.test/', changefreq: 'sometimes'))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -124,7 +124,7 @@ it('accepts priorities within 0.0 and 1.0', function (mixed $raw, string $render
 ]);
 
 it('rejects priorities outside 0.0 and 1.0', function (mixed $priority): void {
-    expect(fn () => new SitemapEntry(loc: 'https://example.test/', priority: $priority))
+    expect(fn (): SitemapEntry => new SitemapEntry(loc: 'https://example.test/', priority: $priority))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'negative' => -0.1,

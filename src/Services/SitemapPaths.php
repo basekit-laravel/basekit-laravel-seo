@@ -15,16 +15,16 @@ use InvalidArgumentException;
  * `/sitemap-1.xml`, `/sitemap-2.xml`, ... — the robots.txt declaration and the
  * sitemap index reference the same paths, keeping everything consistent.
  */
-final class SitemapPaths
+final readonly class SitemapPaths
 {
     /**
      * The route the package serves the sitemap at when no path is configured.
      * The robots.txt sitemap declaration references the same path so the two
      * always stay in sync.
      */
-    public const DEFAULT_PATH = '/sitemap.xml';
+    public const string DEFAULT_PATH = '/sitemap.xml';
 
-    public function __construct(private readonly string $base)
+    public function __construct(private string $base)
     {
         if (trim($base) === '') {
             throw new InvalidArgumentException('basekit-laravel-seo.sitemap.path must not be empty.');
@@ -49,7 +49,7 @@ final class SitemapPaths
      */
     public function chunk(int $index): string
     {
-        return self::withNumber($this->base, $index);
+        return $this->withNumber($this->base, $index);
     }
 
     /**
@@ -57,10 +57,10 @@ final class SitemapPaths
      */
     public function chunkPattern(): string
     {
-        return self::withNumber($this->base, '{n}');
+        return $this->withNumber($this->base, '{n}');
     }
 
-    private static function withNumber(string $base, string|int $number): string
+    private function withNumber(string $base, string|int $number): string
     {
         $normalized = rtrim($base, '/');
 

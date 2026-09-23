@@ -42,7 +42,7 @@ it('renders configured disallow rules', function (): void {
 
 it('omits the sitemap declaration when no trusted origin can be established', function (): void {
     config()->set('app.url', '');
-    config()->set('basekit-laravel-seo.canonical.base_url', null);
+    config()->set('basekit-laravel-seo.canonical.base_url');
 
     $this->get('/robots.txt')
         ->assertStatus(200)

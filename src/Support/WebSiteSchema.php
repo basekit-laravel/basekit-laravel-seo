@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Support;
 
+use Override;
+
 /**
  * JSON-LD WebSite schema (often wrapped with a SearchAction).
  */
@@ -58,7 +60,7 @@ class WebSiteSchema extends Schema
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     protected function attributes(): array
     {
         return $this->data;

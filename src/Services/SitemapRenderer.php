@@ -18,19 +18,19 @@ use BasekitLaravel\BasekitLaravelSeo\Support\SitemapEntry;
  * the chunker so splitting decisions are based on the exact serialized size
  * (UTF-8 byte length, not character count) of each rendered document.
  */
-final class SitemapRenderer
+final readonly class SitemapRenderer
 {
-    public const XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>';
+    public const string XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>';
 
-    private const URLSET_PREFIX = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    private const string URLSET_PREFIX = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-    private const URLSET_SUFFIX = '</urlset>';
+    private const string URLSET_SUFFIX = '</urlset>';
 
-    private const INDEX_PREFIX = '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    private const string INDEX_PREFIX = '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-    private const INDEX_SUFFIX = '</sitemapindex>';
+    private const string INDEX_SUFFIX = '</sitemapindex>';
 
-    public function __construct(private readonly SitemapPaths $paths) {}
+    public function __construct(private SitemapPaths $paths) {}
 
     /**
      * The byte length of an empty urlset document (XML declaration, open/close

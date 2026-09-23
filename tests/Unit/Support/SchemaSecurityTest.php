@@ -30,7 +30,7 @@ it('still renders valid, parseable JSON for every schema', function (): void {
         ->description("Description with <script> and \u{2028} line separators.")
         ->render();
 
-    expect(static fn () => json_decode(
+    expect(static fn (): mixed => json_decode(
         (string) preg_replace('/^<script type="application\/ld\+json">|<\/script>$/', '', $html),
         true,
         512,

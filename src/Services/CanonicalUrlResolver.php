@@ -14,9 +14,9 @@ use Illuminate\Contracts\Container\Container;
  * the canonical default, the sitemap route and the robots.txt sitemap
  * declaration never trust a raw HTTP Host header by themselves.
  */
-final class CanonicalUrlResolver
+final readonly class CanonicalUrlResolver
 {
-    public function __construct(private readonly Container $container) {}
+    public function __construct(private Container $container) {}
 
     /**
      * The trusted origin, or null when no safe base can be established.
@@ -29,7 +29,7 @@ final class CanonicalUrlResolver
         if ($base !== '') {
             $canonical = CanonicalUrl::tryFrom($base);
 
-            if ($canonical !== null) {
+            if ($canonical instanceof CanonicalUrl) {
                 return $canonical;
             }
         }
@@ -43,7 +43,7 @@ final class CanonicalUrlResolver
         $host = strtolower((string) $request->getHost());
 
         $trustedHosts = array_map(
-            'strtolower',
+            strtolower(...),
             array_values((array) config('basekit-laravel-seo.canonical.trusted_hosts', [])),
         );
 

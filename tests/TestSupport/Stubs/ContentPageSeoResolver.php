@@ -6,16 +6,17 @@ namespace BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs;
 
 use BasekitLaravel\BasekitLaravelSeo\Contracts\SeoResolver;
 use BasekitLaravel\BasekitLaravelSeo\SeoData;
+use Override;
 
 final class ContentPageSeoResolver implements SeoResolver
 {
-    #[\Override]
+    #[Override]
     public function supports(mixed $subject): bool
     {
         return $subject instanceof ContentPage;
     }
 
-    #[\Override]
+    #[Override]
     public function resolve(mixed $subject): ?SeoData
     {
         if (! $this->supports($subject)) {

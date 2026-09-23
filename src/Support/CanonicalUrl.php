@@ -16,12 +16,7 @@ use Stringable;
  */
 final readonly class CanonicalUrl implements Stringable
 {
-    public string $url;
-
-    private function __construct(string $url)
-    {
-        $this->url = $url;
-    }
+    private function __construct(public string $url) {}
 
     /**
      * Validate and build a canonical URL from a raw string.

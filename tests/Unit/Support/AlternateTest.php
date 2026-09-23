@@ -27,7 +27,7 @@ it('accepts an existing CanonicalUrl', function (): void {
 });
 
 it('rejects invalid hreflang tags', function (string $hreflang): void {
-    expect(fn () => Alternate::for($hreflang, 'https://example.test/page'))
+    expect(fn (): Alternate => Alternate::for($hreflang, 'https://example.test/page'))
         ->toThrow(InvalidArgumentException::class);
 })->with([
     'empty' => '',
@@ -37,6 +37,6 @@ it('rejects invalid hreflang tags', function (string $hreflang): void {
 ]);
 
 it('rejects unsafe locations', function (): void {
-    expect(fn () => Alternate::for('en', 'javascript:alert(1)'))
+    expect(fn (): Alternate => Alternate::for('en', 'javascript:alert(1)'))
         ->toThrow(InvalidArgumentException::class);
 });

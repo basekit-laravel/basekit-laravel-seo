@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Support;
 
+use Override;
+
 /**
  * JSON-LD Organization schema.
  */
@@ -73,7 +75,7 @@ class OrganizationSchema extends Schema
         return $this;
     }
 
-    #[\Override]
+    #[Override]
     protected function attributes(): array
     {
         return $this->data;

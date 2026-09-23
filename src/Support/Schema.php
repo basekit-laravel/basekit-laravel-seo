@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Support;
 
+use Stringable;
+
 /**
  * Abstract base for structured-data (JSON-LD) builders.
  *
@@ -14,7 +16,7 @@ namespace BasekitLaravel\BasekitLaravelSeo\Support;
  *
  * @phpstan-consistent-constructor
  */
-abstract class Schema
+abstract class Schema implements Stringable
 {
     /**
      * JSON encoding flags shared by every JSON-LD serialization.

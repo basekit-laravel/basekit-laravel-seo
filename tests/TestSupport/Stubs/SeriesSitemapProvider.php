@@ -11,7 +11,7 @@ use BasekitLaravel\BasekitLaravelSeo\Support\SitemapEntry;
  * A provider that generates a given number of sequential URLs, for exercising
  * splitting and byte limits with a predictable dataset.
  */
-final class SeriesSitemapProvider implements SitemapProvider
+final readonly class SeriesSitemapProvider implements SitemapProvider
 {
     /** @var list<SitemapEntry> */
     private array $entries;

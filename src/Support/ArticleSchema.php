@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Support;
 
+use Override;
+
 /**
  * JSON-LD Article schema (also covers BlogPosting / CreativeWork via type()).
  */
@@ -98,7 +100,7 @@ class ArticleSchema extends Schema
         return $this->datePublished($date === null ? null : (string) $date);
     }
 
-    #[\Override]
+    #[Override]
     protected function attributes(): array
     {
         return $this->data;

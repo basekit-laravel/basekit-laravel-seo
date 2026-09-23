@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Services;
 
+use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\SitemapCatalog;
 use LogicException;
 use RuntimeException;
@@ -19,14 +20,14 @@ use RuntimeException;
  * stores the catalog, keeping the cached set consistent. A single request
  * never runs the providers more than once, even when caching is disabled.
  */
-final class SitemapGenerator
+final readonly class SitemapGenerator
 {
     public function __construct(
-        private readonly SitemapAggregator $aggregator,
-        private readonly SitemapChunker $chunker,
-        private readonly SitemapRenderer $renderer,
-        private readonly SitemapCache $cache,
-        private readonly CanonicalUrlResolver $resolver,
+        private SitemapAggregator $aggregator,
+        private SitemapChunker $chunker,
+        private SitemapRenderer $renderer,
+        private SitemapCache $cache,
+        private CanonicalUrlResolver $resolver,
     ) {}
 
     /**
@@ -36,11 +37,11 @@ final class SitemapGenerator
     {
         $cached = $this->cache->catalog();
 
-        if ($cached !== null) {
+        if ($cached instanceof SitemapCatalog) {
             return $cached;
         }
 
-        return $this->regenerate(null)[0];
+        return $this->regenerate()[0];
     }
 
     /**
@@ -54,11 +55,11 @@ final class SitemapGenerator
     {
         $catalog = $this->cache->catalog();
 
-        if ($catalog !== null && $catalog->isIndex()) {
+        if ($catalog instanceof SitemapCatalog && $catalog->isIndex()) {
             return $this->renderer->index($catalog, $this->requireOrigin());
         }
 
-        if ($catalog !== null) {
+        if ($catalog instanceof SitemapCatalog) {
             $cached = $this->cache->document(1);
 
             if ($cached !== null) {
@@ -133,7 +134,7 @@ final class SitemapGenerator
     {
         $origin = $this->resolver->resolve();
 
-        if ($origin === null) {
+        if (! $origin instanceof CanonicalUrl) {
             throw new RuntimeException(
                 'A sitemap index requires a trusted canonical origin. Configure basekit-laravel-seo.canonical.base_url or app.url, or allow the request host in basekit-laravel-seo.canonical.trusted_hosts.',
             );

@@ -29,6 +29,6 @@ it('appends chunk numbers when the base path has no xml extension', function ():
 });
 
 it('rejects an empty sitemap path', function (): void {
-    expect(fn () => new SitemapPaths(''))
+    expect(fn (): SitemapPaths => new SitemapPaths(''))
         ->toThrow(InvalidArgumentException::class);
 });

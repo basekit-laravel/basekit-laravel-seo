@@ -30,7 +30,7 @@ use Illuminate\Contracts\Container\Container;
  */
 final class SeoManager
 {
-    public const RESOLVER_TAG = 'basekit-laravel-seo.resolvers';
+    public const string RESOLVER_TAG = 'basekit-laravel-seo.resolvers';
 
     /**
      * Explicit overrides accumulated through the fluent API.
@@ -178,7 +178,7 @@ final class SeoManager
      */
     private function merge(SeoData $lower, ?SeoData $higher): SeoData
     {
-        if ($higher === null) {
+        if (! $higher instanceof SeoData) {
             return $lower;
         }
 
@@ -196,7 +196,7 @@ final class SeoManager
 
     private function mergeOpenGraph(?OpenGraph $lower, ?OpenGraph $higher): ?OpenGraph
     {
-        if ($higher === null) {
+        if (! $higher instanceof OpenGraph) {
             return $lower;
         }
 
@@ -211,7 +211,7 @@ final class SeoManager
 
     private function mergeTwitter(?TwitterMeta $lower, ?TwitterMeta $higher): ?TwitterMeta
     {
-        if ($higher === null) {
+        if (! $higher instanceof TwitterMeta) {
             return $lower;
         }
 
@@ -243,7 +243,7 @@ final class SeoManager
         if (is_string($ogImage) && $ogImage !== '') {
             $safeImage = CanonicalUrl::tryFrom($ogImage);
 
-            if ($safeImage !== null) {
+            if ($safeImage instanceof CanonicalUrl) {
                 $openGraph = $openGraph->withImage($safeImage->toString());
             }
         }

@@ -8,6 +8,7 @@ use BasekitLaravel\BasekitLaravelSeo\SeoData;
 use BasekitLaravel\BasekitLaravelSeo\SeoManager;
 use BasekitLaravel\BasekitLaravelSeo\Support\Schema;
 use BasekitLaravel\BasekitLaravelSeo\Support\Title;
+use BasekitLaravel\BasekitLaravelSeo\Support\TwitterMeta;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
@@ -36,13 +37,13 @@ use Illuminate\View\Component;
  */
 final class Head extends Component
 {
-    private const TITLE_SEPARATOR = ' | ';
+    private const string TITLE_SEPARATOR = ' | ';
 
-    private const DEFAULT_VIEW = 'basekit-laravel-seo::components.head';
+    private const string DEFAULT_VIEW = 'basekit-laravel-seo::components.head';
 
     public function __construct(
         private readonly SeoManager $manager,
-        private ?SeoData $data = null,
+        private readonly ?SeoData $data = null,
     ) {}
 
     public function render(): View
@@ -60,7 +61,7 @@ final class Head extends Component
                 ),
                 // Twitter defaults come from the config; the card is only rendered
                 // for pages that already carry explicit Twitter metadata.
-                'twitterCard' => $seo->twitter !== null
+                'twitterCard' => $seo->twitter instanceof TwitterMeta
                     ? (string) ($seo->twitter->card ?? config('basekit-laravel-seo.defaults.twitter_card', 'summary_large_image'))
                     : null,
                 'schemas' => array_map(

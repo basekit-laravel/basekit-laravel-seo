@@ -19,7 +19,7 @@ it('normalizes the card to lowercase', function (): void {
 });
 
 it('validates the image against canonical URL safety rules', function (): void {
-    expect(fn () => TwitterMeta::make()->withImage('javascript:alert(1)'))
+    expect(fn (): TwitterMeta => TwitterMeta::make()->withImage('javascript:alert(1)'))
         ->toThrow(InvalidArgumentException::class);
 });
 

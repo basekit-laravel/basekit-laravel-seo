@@ -114,7 +114,7 @@ it('accounts bytes so a rendered urlset length equals the sum of its parts', fun
     ];
 
     $expected = $renderer->scaffoldBytes();
-    $expected += array_sum(array_map(static fn (SitemapEntry $entry): int => $renderer->entryBytes($entry), $entries));
+    $expected += array_sum(array_map($renderer->entryBytes(...), $entries));
 
     expect(strlen($renderer->urlset($entries)))->toBe($expected);
 });

@@ -6,6 +6,7 @@ namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
 use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapPaths;
+use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\Robots;
 use Illuminate\Http\Response;
 
@@ -27,7 +28,7 @@ final class RobotsController
         if ($sitemap === null) {
             $origin = $resolver->resolve();
 
-            if ($origin !== null) {
+            if ($origin instanceof CanonicalUrl) {
                 $sitemap = rtrim($origin->toString(), '/').$paths->base();
             }
         }

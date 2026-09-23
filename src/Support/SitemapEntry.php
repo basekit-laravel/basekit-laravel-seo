@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Stringable;
+use Throwable;
 
 /**
  * An immutable sitemap URL entry.
@@ -21,12 +22,12 @@ use Stringable;
  */
 final readonly class SitemapEntry implements Stringable
 {
-    public const CHANGEFREQ_VALUES = ['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'];
+    public const array CHANGEFREQ_VALUES = ['always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never'];
 
     /**
      * ISO-8601 timestamp with time zone offset, e.g. 2026-09-21T10:30:00+00:00.
      */
-    private const LASTMOD_FORMAT = 'Y-m-d\TH:i:sP';
+    private const string LASTMOD_FORMAT = 'Y-m-d\TH:i:sP';
 
     public string $loc;
 
@@ -48,7 +49,7 @@ final readonly class SitemapEntry implements Stringable
         $this->loc = CanonicalUrl::from($loc)->toString();
 
         if ($lastmod !== null && ! $lastmod instanceof DateTimeInterface) {
-            $lastmod = self::parseLastmod($lastmod);
+            $lastmod = $this->parseLastmod($lastmod);
         }
 
         $this->lastmod = $lastmod;
@@ -103,7 +104,7 @@ final readonly class SitemapEntry implements Stringable
     {
         return array_merge(
             ['loc' => $this->loc],
-            $this->lastmod !== null ? ['lastmod' => $this->lastmod->format(self::LASTMOD_FORMAT)] : [],
+            $this->lastmod instanceof DateTimeInterface ? ['lastmod' => $this->lastmod->format(self::LASTMOD_FORMAT)] : [],
             $this->changefreq !== null ? ['changefreq' => $this->changefreq] : [],
             $this->priority !== null ? ['priority' => (string) $this->priority] : [],
         );
@@ -114,11 +115,11 @@ final readonly class SitemapEntry implements Stringable
         return $this->loc;
     }
 
-    private static function parseLastmod(string $value): DateTimeInterface
+    private function parseLastmod(string $value): DateTimeInterface
     {
         try {
             return new DateTimeImmutable($value);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             throw new InvalidArgumentException(sprintf('The value [%s] is not a valid lastmod date.', $value), 0, $exception);
         }
     }

@@ -16,19 +16,19 @@ use Stringable;
  */
 final readonly class RobotsMeta implements Stringable
 {
-    public const INDEX = 'index';
+    public const string INDEX = 'index';
 
-    public const NOINDEX = 'noindex';
+    public const string NOINDEX = 'noindex';
 
-    public const FOLLOW = 'follow';
+    public const string FOLLOW = 'follow';
 
-    public const NOFOLLOW = 'nofollow';
+    public const string NOFOLLOW = 'nofollow';
 
-    public const NOARCHIVE = 'noarchive';
+    public const string NOARCHIVE = 'noarchive';
 
-    public const NOSNIPPET = 'nosnippet';
+    public const string NOSNIPPET = 'nosnippet';
 
-    public const NOIMAGEINDEX = 'noimageindex';
+    public const string NOIMAGEINDEX = 'noimageindex';
 
     /**
      * @var list<string>
@@ -40,7 +40,7 @@ final readonly class RobotsMeta implements Stringable
      */
     public function __construct(array $directives = [])
     {
-        $this->directives = self::normalize($directives);
+        $this->directives = $this->normalize($directives);
     }
 
     public static function make(): self
@@ -116,7 +116,7 @@ final readonly class RobotsMeta implements Stringable
      * @param  array<int, string>  $directives
      * @return list<string>
      */
-    private static function normalize(array $directives): array
+    private function normalize(array $directives): array
     {
         $result = [];
 

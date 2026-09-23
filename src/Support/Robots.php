@@ -38,10 +38,10 @@ class Robots
         array $disallow = [],
         ?string $sitemap = null,
     ) {
-        $this->userAgents = array_map(self::sanitizeLine(...), $userAgents) ?: ['*'];
-        $this->allow = array_map(self::sanitizeLine(...), $allow);
-        $this->disallow = array_map(self::sanitizeLine(...), $disallow);
-        $this->sitemap = $sitemap === null ? null : self::sanitizeLine($sitemap);
+        $this->userAgents = array_map($this->sanitizeLine(...), $userAgents) ?: ['*'];
+        $this->allow = array_map($this->sanitizeLine(...), $allow);
+        $this->disallow = array_map($this->sanitizeLine(...), $disallow);
+        $this->sitemap = $sitemap === null ? null : $this->sanitizeLine($sitemap);
     }
 
     /**
@@ -62,14 +62,14 @@ class Robots
      */
     public function disallow(array $paths): static
     {
-        $this->disallow = array_values(array_filter(array_map(self::sanitizeLine(...), $paths)));
+        $this->disallow = array_values(array_filter(array_map($this->sanitizeLine(...), $paths)));
 
         return $this;
     }
 
     public function sitemap(?string $url): static
     {
-        $this->sitemap = $url === null ? null : self::sanitizeLine($url);
+        $this->sitemap = $url === null ? null : $this->sanitizeLine($url);
 
         return $this;
     }
@@ -108,7 +108,7 @@ class Robots
      * embedded payloads cannot inject additional directives. Everything after
      * the first control character is discarded.
      */
-    private static function sanitizeLine(string $value): string
+    private function sanitizeLine(string $value): string
     {
         $sanitized = preg_replace('/[\x00-\x1F\x7F].*$/s', '', trim($value));
 

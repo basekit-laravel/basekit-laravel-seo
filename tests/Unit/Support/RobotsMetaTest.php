@@ -20,7 +20,7 @@ it('builds from a comma-separated string', function (): void {
 it('defaults to an empty directive set', function (): void {
     expect((new RobotsMeta)->toString())->toBe('')
         ->and(RobotsMeta::make()->directives)->toBe([])
-        ->and(RobotsMeta::from(null)->toString())->toBe('');
+        ->and(RobotsMeta::from()->toString())->toBe('');
 });
 
 it('supports fluent directive composition and removal', function (): void {

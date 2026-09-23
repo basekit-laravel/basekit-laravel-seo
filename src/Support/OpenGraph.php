@@ -46,7 +46,7 @@ final readonly class OpenGraph implements Stringable
         }
 
         if (isset($data['url'])) {
-            $object = $object->withUrl((string) $data['url']);
+            return $object->withUrl((string) $data['url']);
         }
 
         return $object;

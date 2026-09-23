@@ -107,6 +107,6 @@ it('is JSON serializable', function (): void {
 });
 
 it('rejects unsafe canonical URLs', function (): void {
-    expect(fn () => SeoData::make()->withCanonicalUrl('javascript:alert(1)'))
+    expect(fn (): SeoData => SeoData::make()->withCanonicalUrl('javascript:alert(1)'))
         ->toThrow(InvalidArgumentException::class);
 });

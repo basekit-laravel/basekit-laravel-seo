@@ -27,15 +27,16 @@
     "illuminate/view": "^13"
   },
   "require-dev": {
-    "laravel/pint": "^1.17",
     "larastan/larastan": "^3.8",
+    "laravel/pint": "^1.17",
     "mockery/mockery": "^1.6",
     "nunomaduro/collision": "^8.9",
     "orchestra/testbench": "11.*",
     "pestphp/pest": "^5.0",
     "pestphp/pest-plugin-laravel": "^5.0",
     "phpstan/extension-installer": "^1.4",
-    "phpstan/phpstan-deprecation-rules": "^2.0"
+    "phpstan/phpstan-deprecation-rules": "^2.0",
+    "rector/rector": "^2.6"
   },
   "autoload": {
     "files": [

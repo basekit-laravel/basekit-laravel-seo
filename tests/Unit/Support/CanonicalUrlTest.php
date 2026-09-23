@@ -30,7 +30,7 @@ it('is stringable', function (): void {
 });
 
 it('rejects unsupported URL schemes', function (string $url): void {
-    expect(fn () => CanonicalUrl::from($url))->toThrow(InvalidArgumentException::class);
+    expect(fn (): CanonicalUrl => CanonicalUrl::from($url))->toThrow(InvalidArgumentException::class);
 })->with([
     'javascript' => 'javascript:alert(1)',
     'data' => 'data:text/html,<script>alert(1)</script>',
@@ -40,7 +40,7 @@ it('rejects unsupported URL schemes', function (string $url): void {
 ]);
 
 it('rejects credentials, fragments and control characters', function (string $url): void {
-    expect(fn () => CanonicalUrl::from($url))->toThrow(InvalidArgumentException::class);
+    expect(fn (): CanonicalUrl => CanonicalUrl::from($url))->toThrow(InvalidArgumentException::class);
 })->with([
     'credentials' => 'https://user:pass@example.test/page',
     'user-only' => 'https://user@example.test/page',
@@ -51,8 +51,8 @@ it('rejects credentials, fragments and control characters', function (string $ur
 ]);
 
 it('rejects empty and blank values', function (): void {
-    expect(fn () => CanonicalUrl::from(''))->toThrow(InvalidArgumentException::class)
-        ->and(fn () => CanonicalUrl::from('   '))->toThrow(InvalidArgumentException::class);
+    expect(fn (): CanonicalUrl => CanonicalUrl::from(''))->toThrow(InvalidArgumentException::class)
+        ->and(fn (): CanonicalUrl => CanonicalUrl::from('   '))->toThrow(InvalidArgumentException::class);
 });
 
 it('tryFrom returns null instead of throwing for unsafe values', function (): void {
