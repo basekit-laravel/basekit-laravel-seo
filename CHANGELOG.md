@@ -5,6 +5,13 @@ All notable user-visible changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1](https://github.com/basekit-laravel/basekit-laravel-seo/compare/v1.0.0...v1.0.1) (2026-09-23)
+
+
+### Miscellaneous Chores
+
+* add rector and apply automated code quality refactors ([0647abc](https://github.com/basekit-laravel/basekit-laravel-seo/commit/0647abc40026cb61c73cfe3e398d47a3c4d05c9d))
+
 ## 1.0.0 (2026-09-22)
 
 
