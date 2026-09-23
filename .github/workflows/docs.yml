@@ -3,6 +3,12 @@ name: Deploy docs to GitHub Pages
 on:
   push:
     branches: [master]
+    paths:
+      - 'docs/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
@@ -11,7 +17,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: docs-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,6 +46,7 @@ jobs:
           path: docs/.vitepress/dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

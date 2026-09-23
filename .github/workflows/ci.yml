@@ -3,8 +3,32 @@ name: CI
 on:
   push:
     branches: [master]
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+      - 'phpstan.neon.dist'
+      - 'testbench.yaml'
+      - '.github/workflows/**'
   pull_request:
     branches: [master]
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+      - 'phpstan.neon.dist'
+      - 'testbench.yaml'
+      - '.github/workflows/**'
 
 permissions:
   contents: read
@@ -89,25 +113,3 @@ jobs:
 
       - name: Run static analysis
         run: composer analyse
-
-  docs:
-    name: Docs build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: docs
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-
-      - name: Install docs dependencies
-        run: npm install --no-audit --no-fund
-
-      - name: Build the docs
-        run: npm run docs:build
