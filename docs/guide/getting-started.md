@@ -6,17 +6,16 @@
 composer require basekit-laravel/basekit-laravel-seo
 ```
 
-The service provider is registered automatically (Composer package discovery) —
-no manual registration needed.
+Package discovery registers the service provider; there is nothing to
+register by hand.
 
-Publish the configuration file so you can adjust it:
+Publish the config so you can adjust it:
 
 ```bash
 php artisan vendor:publish --tag="basekit-laravel-seo-config"
 ```
 
-Optionally publish the Blade views (head component and partials) when you want
-to customize them:
+Optionally publish the Blade views when you want to customize them:
 
 ```bash
 php artisan vendor:publish --tag="basekit-laravel-seo-views"
@@ -35,7 +34,7 @@ Add the component inside the `<head>` of your layout:
 </head>
 ```
 
-Until you set metadata, it renders nothing — no invented tags.
+Until you set metadata, it renders nothing.
 
 ### Set metadata
 
@@ -57,13 +56,13 @@ public function show(Article $article)
 }
 ```
 
-That is the core workflow. Details and more examples:
+Next steps:
 
 - [Page metadata](./page-metadata) — every tag group.
 - [Structured data](./structured-data) — the JSON-LD builders.
 - [Resolvers](./resolvers) — let your content provide its own SEO.
 - [XML sitemap](./sitemap) — sitemap providers and `/sitemap.xml`.
-- [robots.txt](./robots) — automatic robots endpoint.
+- [robots.txt](./robots) — the robots endpoint.
 - [Configuration](./configuration) — full config reference.
 
 The sitemap and robots routes are registered automatically:

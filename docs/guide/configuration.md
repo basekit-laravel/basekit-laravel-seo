@@ -6,8 +6,8 @@ Publish the config file and edit it:
 php artisan vendor:publish --tag="basekit-laravel-seo-config"
 ```
 
-This copies `basekit-laravel-seo.php` to your `config/` directory. It already
-annotates every option. The non-obvious parts are explained below.
+This copies `basekit-laravel-seo.php` into your `config/` directory. The file
+is commented in full; the less obvious options are explained below.
 
 ```php
 return [
@@ -77,5 +77,5 @@ return [
 - **`views.head`** points at the template rendered by the head component. Point
   it at your own Blade template to fully control the output; it receives
   `$seo`, `$title`, `$twitterCard` and `$schemas`.
-- **Splitting** happens at entry boundaries using the exact serialized UTF-8
-  size, so a served document is never larger than `max_bytes`.
+- **Splitting** happens at entry boundaries using the exact serialized byte
+  size, so a served document never exceeds `max_bytes`.

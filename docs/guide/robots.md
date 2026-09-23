@@ -34,7 +34,7 @@ Sitemap: https://example.test/sitemap.xml
 When `enabled => false`, the sitemap and robots routes are not registered —
 both respond `404`.
 
-### Safety notes
+### Safety
 
 - Directive values (from config or direct API use) are cut at the first line
   break or control character, so a value containing a newline cannot inject

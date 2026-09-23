@@ -1,8 +1,7 @@
 ## Structured data (JSON-LD)
 
-The package ships schema builders that render valid
-`<script type="application/ld+json">` blocks. Register one (or more) with
-`schema()`:
+Schema builders render valid `<script type="application/ld+json">` blocks.
+Register one (or more) with `schema()`:
 
 ```php
 seo()->schema(WebPageSchema::make()->name('Services'));
@@ -97,7 +96,7 @@ seo()->schema([
 ]);
 ```
 
-### Why it is safe
+### Escaping
 
 Values are JSON-encoded with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS |
 JSON_HEX_QUOT`, so a value such as `</script><script>alert(1)</script>`

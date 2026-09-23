@@ -1,7 +1,7 @@
 # Basekit Laravel SEO
 
-SEO handled in **one place**: page metadata, structured data (JSON-LD),
-robots.txt and XML sitemaps for Basekit-powered Laravel applications.
+Page metadata, structured data (JSON-LD), robots.txt and XML sitemaps for
+Laravel sites in the Basekit ecosystem — in one place.
 
 Install it, drop one component into your layout, and describe each page from
 your controller:
@@ -13,7 +13,7 @@ seo()
     ->canonicalUrl('https://acme.test/services');
 ```
 
-That is rendered in your `<head>`:
+The component renders that in your `<head>`:
 
 ```blade
 <x-basekit-laravel-seo::head />
@@ -25,23 +25,23 @@ That is rendered in your `<head>`:
   Open Graph, Twitter cards and `hreflang` alternates.
 - **Structured data** — JSON-LD builders for `WebSite`, `WebPage`, `Article`
   and `Organization`.
-- **robots.txt** — served automatically from configuration.
-- **XML sitemap** — aggregates entries from your own providers and serves
-  `/sitemap.xml` (splitting into multiple documents automatically for large
-  sites).
+- **robots.txt** — served from configuration.
+- **XML sitemap** — entries aggregated from your own providers, split into
+  multiple documents automatically for large sites.
 
-Nothing is guessed: the package only emits values you (or a resolver) provide.
+Only values you (or a resolver) provide are emitted. Descriptions, canonicals
+and alternates are never filled in on their own.
 
 ## Requirements
 
 PHP `^8.4|^8.5` and Laravel `^13`.
 
-## What this package does not do
+## Non-goals
 
-- It does not know your content. You connect your pages, posts and products
-  through [resolvers](./guide/resolvers) and
+- It does not know your content. You connect pages, posts and products with
+  [resolvers](./guide/resolvers) and
   [sitemap providers](./guide/sitemap).
-- It does not store anything — no database, no admin UI. Sitemap output is
-  cached in the Laravel cache, nothing else is persisted.
+- It stores nothing — no database, no admin UI. Sitemap output is cached in
+  the Laravel cache; everything else lives in the request.
 
 Continue to the [Getting started guide](./guide/getting-started).

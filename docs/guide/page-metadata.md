@@ -1,7 +1,7 @@
 ## Page metadata
 
-Every tag the package can emit lives on one immutable object, `SeoData`,
-which you build through the `seo()` manager.
+Everything the package can render lives on one immutable `SeoData` object.
+You build it through the `seo()` manager.
 
 ### Basic example
 
@@ -93,14 +93,14 @@ Pass a prepared `SeoData` straight to the component instead of resolving:
 
 `seo()` merges three layers, lowest first:
 
-1. **Defaults** from the package config (site name, description, locale, ...).
-2. **The matching resolver** when you call `seo()->for($model)`.
-3. **Explicit values** set through the fluent methods above.
+1. Config defaults (site name, description, locale, ...).
+2. The matching resolver, when you call `seo()->for($model)`.
+3. Your explicit calls to the fluent methods above.
 
-Explicit values win; Open Graph and Twitter merge field by field; lists
-(alternates, schemas) are combined. Values no layer provides are omitted. The
-default canonical URL comes from config (`canonical.base_url`), then `app.url`,
-then an allow-listed request host — never from the raw `Host` header.
+Explicit values win. Open Graph and Twitter merge field by field; lists such
+as alternates and schemas are combined. Anything no layer sets is omitted.
+The default canonical URL comes from `canonical.base_url`, then `app.url`,
+then an allow-listed request host — never the raw `Host` header.
 
 ### Disabling the package
 

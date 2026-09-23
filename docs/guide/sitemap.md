@@ -1,7 +1,7 @@
 ## XML sitemap
 
-The package serves a sitemap at `/sitemap.xml` (path configurable). Its URLs
-come from **providers** — small classes you write, one per content domain.
+The package serves a sitemap at `/sitemap.xml` (path configurable). URLs come
+from providers — small classes you write, one per content area.
 
 ### A sitemap entry
 
@@ -63,23 +63,22 @@ public function register(): void
 }
 ```
 
-### What the package does with the entries
+### Splitting and errors
 
-- **Splits large sites automatically.** `SitemapEntry` output is split at entry
-  boundaries when it exceeds `sitemap.max_urls` (50,000) or
-  `sitemap.max_bytes` (50 MiB). `/sitemap.xml` then becomes a sitemap index and
-  the documents are served at `/sitemap-1.xml`, `/sitemap-2.xml`, ...
-- **Drops duplicates** by URL (first occurrence wins).
-- **Fails loudly.** A provider that throws or yields something that is not a
-  `SitemapEntry` surfaces its error — no partial sitemap is served. A single
-  entry too large to fit in one document raises `InvalidArgumentException`.
-- **Missing chunks are 404.** A request for a chunk that does not exist (for
-  example `/sitemap-99.xml` when only two documents were generated) returns
-  `404` instead of an empty document.
+- **Large sites are split automatically.** When the output exceeds
+  `sitemap.max_urls` (50,000) or `sitemap.max_bytes` (50 MiB), it is split at
+  entry boundaries. `/sitemap.xml` becomes a sitemap index and the documents
+  are served at `/sitemap-1.xml`, `/sitemap-2.xml`, ...
+- **Duplicate URLs are dropped** (first occurrence wins).
+- **Errors surface.** A provider that throws, or yields something that is not
+  a `SitemapEntry`, fails the request — no partial sitemap is served. An
+  entry too large for a single document raises `InvalidArgumentException`.
+- **Missing chunks return 404.** Asking for `/sitemap-99.xml` when only two
+  documents were generated gives a `404`, not an empty document.
 
 ### Caching
 
-Aggregation and rendering are cached so providers do **not** run on every
+Aggregation and rendering are cached so providers do not run on every
 request:
 
 | Config | Default | Meaning |
@@ -88,8 +87,7 @@ request:
 | `sitemap.cache.ttl` | `3600` | Seconds the catalog and documents are kept. |
 | `sitemap.cache.store` | `null` | Cache store; `null` = default store. |
 
-Invalidate after content changes — this is the intended API, no cache internals
-needed:
+After content changes, invalidate the cache:
 
 ```php
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapCache;

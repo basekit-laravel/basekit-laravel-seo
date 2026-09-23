@@ -1,12 +1,12 @@
 ## Resolvers
 
-A resolver teaches the package how to build SEO metadata **for your own
-content** — an Eloquent model, a page class, anything. The package never needs
-to know what your content is.
+A resolver builds SEO metadata for your own content — an Eloquent model, a
+page class, anything. The package itself never needs to know what that
+content is.
 
-### A worked example
+### Example
 
-Say you have an `Article` model with a title, an excerpt and a published state.
+Take an `Article` model with a title, an excerpt and a published state.
 
 **1. Implement the contract:**
 
@@ -58,8 +58,8 @@ public function show(Article $article)
 }
 ```
 
-The head component now renders the resolver's metadata automatically — and you
-can still override individual values per request:
+The head component now renders that metadata. You can still override
+individual values per request:
 
 ```php
 seo()->for($article)->title('Read this first')->data();
@@ -70,11 +70,10 @@ seo()->for($article)->title('Read this first')->data();
 - `supports()` decides whether this resolver handles a given subject.
 - `resolve()` returns the metadata, or `null` when nothing applies (the
   resolver above skips unpublished articles).
-- The **first** resolver whose `supports()` returns `true` wins; tag order
+- The first resolver whose `supports()` returns `true` wins; tag order
   defines precedence.
-- Returned values are merged under the config defaults, and any `seo()` fluent
-  calls override them.
-- Only safe values can be returned: canonical and alternate URLs are validated
+- Resolver values sit above the config defaults; `seo()` calls override them.
+- Canonical and alternate URLs are validated before they are used
   (http/https only, no credentials or fragments).
 
 The metadata you build is the same `SeoData` described on the
