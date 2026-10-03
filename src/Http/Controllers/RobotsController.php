@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
+use BasekitLaravel\BasekitLaravelSeo\Http\CacheableResponse;
 use BasekitLaravel\BasekitLaravelSeo\Services\CanonicalUrlResolver;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapPaths;
 use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\Robots;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -19,7 +21,7 @@ use Illuminate\Http\Response;
  */
 final class RobotsController
 {
-    public function __invoke(CanonicalUrlResolver $resolver, SitemapPaths $paths): Response
+    public function __invoke(Request $request, CanonicalUrlResolver $resolver, SitemapPaths $paths): Response
     {
         $config = (array) config('basekit-laravel-seo.robots', []);
 
@@ -35,6 +37,13 @@ final class RobotsController
 
         $config['sitemap'] = $sitemap;
 
-        return Robots::make($config)->response();
+        $robots = Robots::make($config);
+
+        return CacheableResponse::make(
+            $request,
+            $robots->toString(),
+            'text/plain; charset=utf-8',
+            max(0, (int) ($config['cache_ttl'] ?? 3600)),
+        );
     }
 }

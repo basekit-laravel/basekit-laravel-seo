@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
+use BasekitLaravel\BasekitLaravelSeo\Http\CacheableResponse;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapGenerator;
 use BasekitLaravel\BasekitLaravelSeo\Support\SitemapDocument;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -15,7 +17,7 @@ use Illuminate\Http\Response;
  */
 final class SitemapChunkController
 {
-    public function __invoke(SitemapGenerator $generator, string $n): Response
+    public function __invoke(Request $request, SitemapGenerator $generator, string $n): Response
     {
         $index = (int) $n;
 
@@ -23,6 +25,11 @@ final class SitemapChunkController
             abort(404);
         }
 
-        return response($generator->documentXml($index), 200, ['Content-Type' => 'application/xml']);
+        return CacheableResponse::make(
+            $request,
+            $generator->documentXml($index),
+            'application/xml',
+            SitemapGenerator::maxAge(),
+        );
     }
 }

@@ -72,6 +72,14 @@ return [
         'allow' => ['/'],
         'disallow' => [],
         'sitemap' => null,
+
+        /*
+        | `cache_ttl` is the `Cache-Control: max-age` window advertised on the
+        | robots.txt response, in seconds. Crawlers poll robots.txt often, so a
+        | positive value lets browsers, CDNs and crawlers skip the transfer
+        | entirely between changes. Set to 0 to revalidate on every request.
+        */
+        'cache_ttl' => 3600,
     ],
 
     /*
@@ -89,10 +97,19 @@ return [
     | single document is emitted while its URL count stays at or below
     | `max_urls` and its rendered XML stays at or below `max_bytes`.
     |
+    | `middleware` is applied to the package's own routes. It defaults to empty
+    | because the routes are registered outside your application's `web` group,
+    | so they receive none of its middleware. Add `throttle` here to rate-limit
+    | crawler traffic, e.g. ['throttle:60,1'].
+    |
     | `cache` holds the aggregated and split documents in the Laravel cache so
     | providers are not re-executed on every request. `store` accepts a cache
-    | store name (null = the application's default store); `ttl` is in seconds.
-    | Clear the caches with `app(SitemapCache::class)->clear()`.
+    | store name (null = the application's default store); `ttl` is in seconds
+    | and doubles as the `Cache-Control: max-age` advertised to clients.
+    | Regeneration is serialised behind a cache lock, so a crawler burst right
+    | after expiry produces one regeneration rather than one per request.
+    | Clear or warm the cache with `php artisan basekit-seo:sitemap:clear` and
+    | `php artisan basekit-seo:sitemap:warm`, or `app(SitemapCache::class)->clear()`.
     |
     */
 
@@ -100,6 +117,7 @@ return [
         'path' => env('BASEKIT_SEO_SITEMAP_PATH', '/sitemap.xml'),
         'max_urls' => 50_000,
         'max_bytes' => 50 * 1024 * 1024,
+        'middleware' => [],
         'cache' => [
             'enabled' => (bool) env('BASEKIT_SEO_SITEMAP_CACHE', true),
             'ttl' => 3600,

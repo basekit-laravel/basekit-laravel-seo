@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BasekitLaravel\BasekitLaravelSeo\Http\Controllers;
 
+use BasekitLaravel\BasekitLaravelSeo\Http\CacheableResponse;
 use BasekitLaravel\BasekitLaravelSeo\Services\SitemapGenerator;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -17,8 +19,13 @@ use Illuminate\Http\Response;
  */
 final class SitemapController
 {
-    public function __invoke(SitemapGenerator $generator): Response
+    public function __invoke(Request $request, SitemapGenerator $generator): Response
     {
-        return response($generator->baseDocument(), 200, ['Content-Type' => 'application/xml']);
+        return CacheableResponse::make(
+            $request,
+            $generator->baseDocument(),
+            'application/xml',
+            SitemapGenerator::maxAge(),
+        );
     }
 }
