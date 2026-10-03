@@ -70,7 +70,7 @@ Use this skill when implementing or changing any part of this Laravel package
 
 - Use the package `TestCase` (Orchestra Testbench) for anything touching the framework.
 - Test the public behaviour a consumer would rely on; keep unit tests fast and dependency-free.
-- Run `composer test` (and the configured analysis) before finishing and report real results.
+- Run `composer check` (lint + analyse + test) before finishing and report real results.
 
 ## Verification checklist
 

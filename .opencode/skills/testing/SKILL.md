@@ -29,8 +29,13 @@ Use this skill when writing or running tests for this Laravel package
 ## Running tests
 
 ```bash
-composer test        # full Pest suite
+composer test            # full Pest suite
+composer test-coverage   # HTML report in build/coverage (needs xdebug or pcov)
 ```
+
+No coverage driver is installed by default in a local environment, so
+`composer test-coverage` only works where one is available; CI runs it with pcov
+and a `--min` floor.
 
 Run the targeted subset while iterating, then the full suite before finishing. Report the
 actual output — never claim passing tests you did not run.

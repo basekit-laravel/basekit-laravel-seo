@@ -10,7 +10,8 @@ The package serves `/robots.txt` automatically, built from configuration.
     'user_agents' => ['*'],
     'allow' => ['/'],
     'disallow' => ['/private'],
-    'sitemap' => null, // null = derive from the canonical origin
+    'sitemap' => null,     // null = derive from the canonical origin
+    'cache_ttl' => 3600,   // HTTP freshness in seconds; 0 disables caching
 ],
 ```
 
@@ -28,6 +29,22 @@ Sitemap: https://example.test/sitemap.xml
   (see `canonical.base_url` / `app.url`) plus the configured sitemap path, so
   the declaration always matches the actual route.
 - A configured `sitemap` value is emitted as given.
+
+### HTTP caching
+
+`/robots.txt` is served with `Cache-Control: public, max-age=<cache_ttl>`, a
+strong `ETag` and `X-Content-Type-Options: nosniff`, and answers `304 Not
+Modified` to conditional requests. Because robots.txt changes rarely, a day is a
+more useful default than an hour:
+
+```php
+'robots' => [
+    'cache_ttl' => 86_400,
+],
+```
+
+Set it to `0` to send no caching headers at all. See
+[HTTP caching](/guide/caching).
 
 ### Disabling the routes
 

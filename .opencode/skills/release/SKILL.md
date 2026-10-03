@@ -22,7 +22,8 @@ Use this skill when preparing a release for this Laravel package
 4. **Compatibility**: confirm the package still supports the declared PHP (`^8.4|^8.5`) and
    Laravel (`^13`) constraints.
 5. **Verification**: run the full suite and static analysis and record the real results —
-   `composer test`, and any configured analysis/formatting commands from `composer.json`.
+   `composer check` and `composer audit`, plus any configured coverage command from
+   `composer.json`. Never lower the coverage floor to make a build pass.
 
 ## Release sequence
 

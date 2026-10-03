@@ -75,6 +75,12 @@ public function register(): void
   entry too large for a single document raises `InvalidArgumentException`.
 - **Missing chunks return 404.** Asking for `/sitemap-99.xml` when only two
   documents were generated gives a `404`, not an empty document.
+- **A split sitemap needs a trusted origin.** The `<sitemapindex>` references
+  chunk URLs with absolute locations, so with no `canonical.base_url`, no
+  `app.url` and an untrusted request host the package refuses to invent one and
+  fails with an explanatory message. Configure `canonical.base_url` (or
+  `trusted_hosts`) for any site large enough to be split. A single unsplit
+  document is unaffected — it only contains provider-supplied locations.
 
 ### Caching
 
@@ -84,8 +90,16 @@ request:
 | Config | Default | Meaning |
 | --- | --- | --- |
 | `sitemap.cache.enabled` | `true` | Master switch. |
-| `sitemap.cache.ttl` | `3600` | Seconds the catalog and documents are kept. |
+| `sitemap.cache.ttl` | `3600` | Seconds the catalog and documents are kept. Also the HTTP `max-age`. |
 | `sitemap.cache.store` | `null` | Cache store; `null` = default store. |
+
+Concurrent requests that arrive on a cold cache take a short-lived lock so only
+one rebuilds the sitemap; the others serve the freshly written document. For
+long-lived documents it is usually better to warm the cache after a deploy:
+
+```bash
+php artisan basekit-seo:sitemap:warm
+```
 
 After content changes, invalidate the cache:
 
@@ -94,3 +108,15 @@ use BasekitLaravel\BasekitLaravelSeo\Services\SitemapCache;
 
 app(SitemapCache::class)->clear();
 ```
+
+Or from the command line:
+
+```bash
+php artisan basekit-seo:sitemap:clear
+```
+
+Documents are keyed on their rendered content rather than on the request, and
+each one is served with an `ETag`, `Cache-Control` and `304 Not Modified`
+support — so a CDN can cache them without hitting your application. See
+[HTTP caching](/guide/caching) and
+[Console commands](/guide/console-commands).

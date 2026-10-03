@@ -1,61 +1,38 @@
 # Basekit Laravel SEO
 
-Metadata, structured data (JSON-LD), robots.txt and XML sitemaps for Laravel
-sites in the Basekit ecosystem.
+[![CI](https://github.com/basekit-laravel/basekit-laravel-seo/actions/workflows/ci.yml/badge.svg)](https://github.com/basekit-laravel/basekit-laravel-seo/actions/workflows/ci.yml) [![Packagist](https://img.shields.io/packagist/v/basekit-laravel/basekit-laravel-seo.svg)](https://packagist.org/packages/basekit-laravel/basekit-laravel-seo) [![License](https://img.shields.io/packagist/l/basekit-laravel/basekit-laravel-seo.svg)](LICENSE) [![PHP](https://img.shields.io/packagist/php-v/basekit-laravel/basekit-laravel-seo.svg)](https://packagist.org/packages/basekit-laravel/basekit-laravel-seo) [![Laravel](https://img.shields.io/badge/Laravel-13-ff2d20.svg)](https://laravel.com)
+[![Docs](https://img.shields.io/badge/docs-basekit--laravel--seo-blue.svg)](https://basekit-laravel.github.io/basekit-laravel-seo/)
 
-Install the package, render one component in your layout, and set page
-metadata from your controllers. Nothing is stored, and no value is invented —
-whatever you (or a resolver) do not provide is left out.
+SEO metadata, structured data, robots.txt and XML sitemaps for Laravel.
 
-| Component | Constraint |
-| --- | --- |
-| PHP | `^8.4` or `^8.5` |
-| Laravel | `^13` |
+Set page metadata from your application and render it with a single Blade component. The package supports standard metadata, Open Graph, Twitter/X, `hreflang`, JSON-LD, robots.txt and XML sitemaps.
 
-## Features
+Nothing is stored in the database, and values that you do not provide are simply omitted.
 
-- **Page metadata** — one immutable `SeoData` value object per request:
-  title, description, canonical URL, robots, Open Graph, Twitter/X, locale,
-  `hreflang` alternates and JSON-LD schemas.
-- **`seo()` helper** — fluent access to the same data: `title()`,
-  `description()`, `canonicalUrl()`, `robots()`, `openGraph()`, `twitter()`,
-  `locale()`, `alternate()`, `schema()` and `for($subject)`.
-- **Layered resolution** — values merge from config defaults, the first
-  supporting `SeoResolver`, then your explicit calls. Explicit calls win;
-  anything no layer sets is omitted.
-- **Head component** — `<x-basekit-laravel-seo::head />` renders the
-  resolved metadata: title (with configurable suffix), description,
-  canonical, robots, Open Graph, Twitter/X, `hreflang` and JSON-LD.
-- **Resolvers** — implement `SeoResolver` and tag it to describe your own
-  content: models, page classes, anything.
-- **Structured data** — JSON-LD builders for `WebSite`, `WebPage`, `Article`
-  (including `BlogPosting`) and `Organization`. Plain arrays are accepted
-  with the same escaping.
-- **Canonical URLs** — resolved from `canonical.base_url`, then `app.url`,
-  then an allow-listed request host. The raw `Host` header is never used.
-- **robots.txt** — `/robots.txt` served from configuration, with the
-  `Sitemap:` line derived from the canonical origin.
-- **XML sitemap** — `/sitemap.xml` built from tagged `SitemapProvider`
-  classes. Output over `max_urls` or `max_bytes` is split into
-  `/sitemap-{n}.xml` documents behind a sitemap index, and cached until
-  `SitemapCache::clear()` is called.
+## Requirements
+
+- PHP 8.4 or 8.5
+- Laravel 13
 
 ## Installation
+
+Install the package:
 
 ```bash
 composer require basekit-laravel/basekit-laravel-seo
 ```
 
-Package discovery registers the service provider. Publish and review the
-configuration:
+Package discovery registers the service provider automatically.
+
+Publish the configuration if you want to change the defaults:
 
 ```bash
 php artisan vendor:publish --tag="basekit-laravel-seo-config"
 ```
 
-## Quick start
+## Usage
 
-Render the head in your layout:
+Add the head component to your layout:
 
 ```blade
 <head>
@@ -66,93 +43,260 @@ Render the head in your layout:
 </head>
 ```
 
-Set metadata from a controller:
+Then set metadata from a controller or anywhere else in the request:
 
 ```php
-use App\Models\Article;
-
 public function show(Article $article)
 {
     seo()
-        ->for($article)
         ->title($article->title)
         ->description($article->excerpt)
         ->canonicalUrl(route('articles.show', $article));
 
-    return view('articles.show', ['article' => $article]);
+    return view('articles.show', [
+        'article' => $article,
+    ]);
 }
 ```
 
-For content types that own their metadata, implement `SeoResolver`; for
-sitemap URLs, implement `SitemapProvider`. The package also serves
-`/sitemap.xml`, `/sitemap-{n}.xml` (when split) and `/robots.txt` on its own.
+The head component renders the values that were set and leaves everything else out.
+
+## Metadata
+
+The `seo()` helper provides a fluent API for page metadata:
+
+```php
+seo()
+    ->title('About us')
+    ->description('Learn more about our company.')
+    ->canonicalUrl(route('about'))
+    ->robots('index, follow')
+    ->locale('en_US');
+```
+
+It also supports:
+
+- Open Graph metadata
+- Twitter/X metadata
+- `hreflang` alternates
+- JSON-LD structured data
+
+Explicit values override resolver and configuration defaults.
+
+## Resolvers
+
+For models or other content types that know how their SEO metadata should be built, create a resolver implementing `SeoResolver`.
+
+```php
+seo()->for($article);
+```
+
+The first registered resolver that supports the subject provides its metadata. You can still override individual values afterwards:
+
+```php
+seo()
+    ->for($article)
+    ->title('Custom title');
+```
+
+## Structured data
+
+JSON-LD can be added through the `schema()` API.
+
+The package includes builders for:
+
+- `WebSite`
+- `WebPage`
+- `Article`
+- `BlogPosting`
+- `Organization`
+
+Plain arrays are also supported.
+
+## Open Graph and Twitter/X
+
+Open Graph and Twitter/X metadata are rendered by the head component together with the standard page metadata.
+
+Configure defaults globally or set values for individual requests through the `seo()` helper or a resolver.
+
+## Canonical URLs
+
+Canonical URLs can be set explicitly:
+
+```php
+seo()->canonicalUrl(
+    route('articles.show', $article)
+);
+```
+
+When resolving canonical URLs automatically, the package uses the configured canonical base URL, then `app.url`, and finally an allow-listed request host.
+
+The raw `Host` header is never used directly.
+
+## Alternate languages
+
+Add `hreflang` alternates with:
+
+```php
+seo()->alternate('de', 'https://example.com/de/about');
+seo()->alternate('en', 'https://example.com/en/about');
+```
+
+Alternates are not generated automatically.
+
+## robots.txt
+
+The package serves:
+
+```text
+/robots.txt
+```
+
+Its contents are configured through `config/basekit-laravel-seo.php`.
+
+The sitemap URL can be included automatically using the canonical site origin.
+
+## XML sitemap
+
+The package serves:
+
+```text
+/sitemap.xml
+```
+
+Register `SitemapProvider` implementations to contribute URLs.
+
+Large sitemaps are automatically split according to the configured URL or byte limits:
+
+```text
+/sitemap.xml
+/sitemap-1.xml
+/sitemap-2.xml
+```
+
+When splitting is required, `/sitemap.xml` becomes a sitemap index.
+
+Sitemap output is cached so providers only run on a cache miss. Concurrent
+requests on a cold cache take a short-lived lock, so only one rebuilds the
+sitemap.
+
+Warm it after a deploy, and clear it when your content changes:
+
+```bash
+php artisan basekit-seo:sitemap:warm
+php artisan basekit-seo:sitemap:clear
+```
+
+The equivalent API for application code (for example in a model observer):
+
+```php
+app(SitemapCache::class)->clear();
+app(SitemapGenerator::class)->regenerateNow();
+```
+
+### HTTP caching
+
+The sitemap and robots.txt endpoints send `Cache-Control`, an `ETag` and
+`X-Content-Type-Options: nosniff`, and answer `304 Not Modified` to conditional
+requests, so a CDN can serve repeat crawls without hitting your application.
+
+Freshness is controlled by `sitemap.cache.ttl` and `robots.cache_ttl`; setting
+either to `0` disables caching for that endpoint.
 
 ## Configuration
 
-Everything is optional — the head renders nothing until you (or a resolver)
-provide values. The published `config/basekit-laravel-seo.php` controls:
+The published configuration controls:
 
-- `enabled` — master switch; when `false`, the head component renders nothing
-  and the sitemap/robots routes are not registered.
-- `defaults` — site name, title suffix, description, Open Graph image and
-  card, locale.
-- `canonical` — `base_url` and `trusted_hosts` for canonical URL resolution.
-- `robots` — `/robots.txt` directives (`user_agents`, `allow`, `disallow`,
-  `sitemap`).
-- `sitemap` — route `path`, splitting limits (`max_urls`, `max_bytes`) and
-  caching (`enabled`, `ttl`, `store`).
-- `views` — the `head` Blade template used by the component.
+- package enable/disable state
+- default metadata
+- title suffix
+- default Open Graph image
+- canonical URL handling
+- trusted hosts
+- robots.txt contents and cache lifetime
+- sitemap routes, limits, caching and route middleware
+- Blade views
 
-## Extending
+All defaults are optional.
 
-- **Resolvers** — implement `SeoResolver` (`supports()` / `resolve()`) and
-  tag it with `SeoManager::RESOLVER_TAG` to provide metadata for your content.
-- **Sitemap providers** — implement `SitemapProvider` (`entries()`) and tag
-  it with `SitemapProvider::PROVIDER_TAG` to contribute URLs.
-- **Views** — publish them (`--tag="basekit-laravel-seo-views"`) and edit the
-  partials, or point `views.head` at your own Blade template.
+Values the package cannot render a correct result with — such as
+`sitemap.max_urls` outside `1`–`50000` — are rejected while the service provider
+boots, so a misconfiguration fails the deploy instead of breaking a crawler
+later.
+
+By default the package's routes carry no middleware. Add throttling yourself if
+you want it:
+
+```php
+'sitemap' => [
+    'middleware' => ['throttle:60,1'],
+],
+```
+
+## Custom views
+
+Publish the package views:
+
+```bash
+php artisan vendor:publish --tag="basekit-laravel-seo-views"
+```
+
+You can then modify the provided templates or configure the package to use your own head view.
 
 ## Security
 
-- Canonical, Open Graph, Twitter, alternate and sitemap URLs are validated:
-  http/https only, no credentials, fragments or control characters.
-- JSON-LD is hex-escaped so values cannot break out of the `<script>` element;
-  sitemap values are XML-escaped.
-- robots.txt values are cut at the first line break or control character, so
-  they cannot inject extra directives.
-- No URL is built from the raw `Host` header.
+URLs used for canonical links, Open Graph, Twitter/X, alternates and sitemaps are validated before output.
+
+The package also escapes JSON-LD, XML, Open Graph and Twitter/X output and prevents robots.txt values from injecting additional directives.
+
+Nothing is ever built from the raw `Host` header: sitemap index locations and the robots.txt `Sitemap:` declaration come from a trusted canonical origin only. A split sitemap refuses to render at all when no trusted origin can be established, rather than inventing one.
+
+CI runs `composer audit` on every push, so a newly published advisory in the dependency tree fails the build.
 
 ## Limitations
 
-- The package does not know your content. It enters only through
-  `SeoResolver` and `SitemapProvider` implementations.
-- No database, no Eloquent, Livewire or Filament dependency, no admin UI.
-  State lives in the request (plus the Laravel cache for sitemaps).
-- No video/image/news sitemaps or Google extensions, and `hreflang`
-  alternates are never auto-generated.
+The package does not discover your application's content automatically.
+
+Use `SeoResolver` implementations for page metadata and `SitemapProvider` implementations for sitemap entries.
+
+The package does not provide:
+
+- database storage
+- an admin interface
+- Eloquent-specific SEO models
+- automatically generated `hreflang` links
+- image, video or news sitemaps
 
 ## Documentation
 
-Full documentation is published at
-<https://basekit-laravel.github.io/basekit-laravel-seo/>:
+Full documentation:
 
-- [Getting started](https://basekit-laravel.github.io/basekit-laravel-seo/guide/getting-started.html)
-- [Page metadata](https://basekit-laravel.github.io/basekit-laravel-seo/guide/page-metadata.html)
-- [Structured data (JSON-LD)](https://basekit-laravel.github.io/basekit-laravel-seo/guide/structured-data.html)
-- [Resolvers](https://basekit-laravel.github.io/basekit-laravel-seo/guide/resolvers.html)
-- [XML sitemap](https://basekit-laravel.github.io/basekit-laravel-seo/guide/sitemap.html)
-- [robots.txt](https://basekit-laravel.github.io/basekit-laravel-seo/guide/robots.html)
-- [Configuration](https://basekit-laravel.github.io/basekit-laravel-seo/guide/configuration.html)
+https://basekit-laravel.github.io/basekit-laravel-seo/
+
+It covers:
+
+- getting started
+- page metadata
+- structured data
+- resolvers
+- XML sitemaps
+- robots.txt
+- HTTP caching
+- console commands
+- configuration
+- deployment (including Laravel Octane)
 
 ## Testing
 
 ```bash
-composer test          # vendor/bin/pest
-composer analyse       # vendor/bin/phpstan analyse
-composer format        # vendor/bin/pint
-composer lint          # vendor/bin/pint --test
+composer test           # Pest
+composer test-coverage  # Pest with a coverage report in build/coverage
+composer analyse        # PHPStan / Larastan
+composer lint           # Laravel Pint (check only)
+composer format         # Laravel Pint (apply fixes)
+composer audit          # Known dependency vulnerabilities
 ```
 
 ## License
 
-Licensed under the [MIT license](LICENSE).
+MIT.

@@ -27,6 +27,7 @@ Read `AGENTS.md` first and follow its "Agent rules" and "Package development" se
 1. Inspect the existing code, service provider, composer constraints, and tests before writing.
 2. Search for existing equivalents before creating new classes or config keys.
 3. Implement the smallest correct change following the package's existing patterns.
-4. Run the configured tests and analysis for the affected areas (`composer test`,
-   `composer format`, and any configured static analysis) and report the real output.
+4. Run the configured checks for the affected areas (`composer test`,
+   `composer lint`/`composer format`, `composer analyse`, `composer audit`, or
+   `composer check` for lint + analyse + test) and report the real output.
 5. Add or update tests for every meaningful behaviour change.

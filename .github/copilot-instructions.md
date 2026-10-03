@@ -21,8 +21,29 @@ that only read `copilot-instructions.md` (for example code review) still follow 
 ## Verification commands (use only those configured in composer.json)
 
 - Tests: `composer test`
-- Code style: `composer format` (Laravel Pint)
-- Static analysis: `composer analyse` (PHPStan)
+- Coverage: `composer test-coverage` (HTML report in `build/coverage`; needs a
+  coverage driver, which CI provides)
+- Code style: `composer lint` (check, as CI runs it) / `composer format` (apply fixes)
+- Static analysis: `composer analyse` (PHPStan/Larastan)
+- Vulnerabilities: `composer audit`
+- All of the above except coverage: `composer check`
+
+## Correctness expectations
+
+- Long-running workers (Octane, queue) keep bindings alive. `SeoManager` and
+  `SitemapGenerator` are `scoped`; `SitemapChunker` and `SitemapRenderer` must stay
+  stateless. Never introduce per-request state on a shared singleton.
+- Rendered sitemaps are cached and served with `Cache-Control`/`ETag`/`304`. Any change
+  to provider output needs a cache invalidation, and rendering changes legitimately
+  change the ETag — do not weaken caching headers to make a test pass.
+- Nothing may be built from the raw `Host` header; URLs come from a trusted canonical
+  origin.
+
+## Commits
+
+Write a single conventional-commit subject line (`feat:`, `fix:`, `perf:`, `docs:`,
+`ci:`, `chore:`) and no commit body. release-please generates the changelog from
+those subjects, so keep them short and put rationale in the pull request.
 
 ## Repository guardrails
 
