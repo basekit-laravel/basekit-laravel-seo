@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Route;
 
 $paths = app(SitemapPaths::class);
 
-Route::get($paths->base(), SitemapController::class);
+$middleware = config('basekit-laravel-seo.sitemap.middleware', []);
 
-Route::get($paths->chunkPattern(), SitemapChunkController::class)->where('n', '[1-9][0-9]*');
+$group = Route::middleware(is_array($middleware) ? $middleware : [$middleware]);
 
-Route::get('/robots.txt', RobotsController::class);
+$group->get($paths->base(), SitemapController::class);
+
+$group->get($paths->chunkPattern(), SitemapChunkController::class)->where('n', '[1-9][0-9]*');
+
+$group->get('/robots.txt', RobotsController::class);
