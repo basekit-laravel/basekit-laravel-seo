@@ -52,7 +52,7 @@ class WebPageSchema extends Schema
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $items
+     * @param  array<int, array<string, mixed>|Schema>  $items
      */
     public function breadcrumb(array $items): static
     {
@@ -62,7 +62,7 @@ class WebPageSchema extends Schema
 
         $this->data['breadcrumb'] = [
             '@type' => 'BreadcrumbList',
-            'itemListElement' => array_values($items),
+            'itemListElement' => $this->mapNested($items),
         ];
 
         return $this;
