@@ -38,7 +38,7 @@ final readonly class SitemapRenderer
      * document shares, so `scaffoldBytes + sum(entryBytes)` equals the exact
      * serialized size of a rendered urlset.
      */
-    public function scaffoldBytes(): int
+    public static function scaffoldBytes(): int
     {
         return strlen(self::XML_DECLARATION)
             + strlen(self::URLSET_PREFIX)
@@ -133,7 +133,14 @@ final readonly class SitemapRenderer
      */
     private function escape(string $value): string
     {
-        $sanitized = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $value) ?? $value;
+        // Deliberately no /u modifier: every character in these ranges is below
+        // 0x80, and a valid UTF-8 multi-byte sequence is always a lead byte
+        // (0xC2-0xF4) followed by continuation bytes (0x80-0xBF). Stripping them
+        // byte-wise therefore can never split a valid sequence, and unlike a
+        // /u pattern it still succeeds when the input is not valid UTF-8. With
+        // /u, preg_replace() returns null for such input and the control
+        // characters would survive into the sitemap, producing invalid XML.
+        $sanitized = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $value) ?? '';
 
         return htmlspecialchars($sanitized, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }

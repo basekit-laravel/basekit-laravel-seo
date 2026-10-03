@@ -97,12 +97,19 @@ final readonly class OpenGraph implements Stringable
         ], static fn (mixed $value): bool => $value !== null);
     }
 
+    /**
+     * The Open Graph properties as `<meta name="og:…">` attribute fragments.
+     *
+     * Keys and values are both HTML-escaped, so the result is safe to emit
+     * directly (e.g. `<meta {!! $seo->openGraph !!}>`) and cannot be used to
+     * break out of the attribute and inject arbitrary markup.
+     */
     public function toString(): string
     {
         $parts = [];
 
         foreach ($this->toArray() as $key => $value) {
-            $parts[] = 'og:'.$key.'="'.$value.'"';
+            $parts[] = 'og:'.$this->escape((string) $key).'="'.$this->escape((string) $value).'"';
         }
 
         return implode(' ', $parts);
@@ -111,6 +118,11 @@ final readonly class OpenGraph implements Stringable
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    private function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }
 
     /**

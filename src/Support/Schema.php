@@ -23,11 +23,18 @@ abstract class Schema implements Stringable
      *
      * Slashes are left readable while angle brackets, ampersands and quotes are
      * hex-escaped so untrusted strings can never terminate the surrounding
-     * <script> element. JSON_THROW_ON_ERROR surfaces malformed payloads loudly.
+     * <script> element.
+     *
+     * JSON_INVALID_UTF8_SUBSTITUTE replaces malformed byte sequences with U+FFFD
+     * rather than failing. Metadata is frequently read from legacy database
+     * columns that are not guaranteed to be valid UTF-8, and one bad byte must
+     * not turn into an uncaught exception on every page render. Genuinely
+     * unencodable input (a non-finite float, a recursive structure) still throws
+     * via JSON_THROW_ON_ERROR.
      */
     public const ENCODE_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-        | JSON_THROW_ON_ERROR;
+        | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR;
 
     /**
      * The JSON-LD @type for this schema.
@@ -82,7 +89,7 @@ abstract class Schema implements Stringable
      * Convert an array of Schema objects to nested array data.
      *
      * @param  iterable<Schema|array<mixed>>  $items
-     * @return array<int, array<string, mixed>>
+     * @return array<int, array<mixed>>
      */
     protected function mapNested(iterable $items): array
     {

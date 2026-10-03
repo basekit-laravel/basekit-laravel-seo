@@ -101,12 +101,19 @@ final readonly class TwitterMeta implements Stringable
         ], static fn (mixed $value): bool => $value !== null);
     }
 
+    /**
+     * The Twitter card properties as `<meta name="twitter:…">` attribute fragments.
+     *
+     * Keys and values are both HTML-escaped, so the result is safe to emit
+     * directly (e.g. `<meta {!! $seo->twitter !!}>`) and cannot be used to
+     * break out of the attribute and inject arbitrary markup.
+     */
     public function toString(): string
     {
         $parts = [];
 
         foreach ($this->toArray() as $key => $value) {
-            $parts[] = 'twitter:'.$key.'="'.$value.'"';
+            $parts[] = 'twitter:'.$this->escape((string) $key).'="'.$this->escape((string) $value).'"';
         }
 
         return implode(' ', $parts);
@@ -115,6 +122,11 @@ final readonly class TwitterMeta implements Stringable
     public function __toString(): string
     {
         return $this->toString();
+    }
+
+    private function escape(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }
 
     /**
