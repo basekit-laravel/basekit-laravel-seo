@@ -6,6 +6,7 @@ namespace BasekitLaravel\BasekitLaravelSeo\Services;
 
 use BasekitLaravel\BasekitLaravelSeo\Contracts\SitemapProvider;
 use BasekitLaravel\BasekitLaravelSeo\Support\SitemapEntry;
+use Generator;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -16,17 +17,37 @@ use InvalidArgumentException;
  * The first occurrence of each canonical loc wins; later duplicates are
  * dropped. Provider failures are never swallowed — a partial sitemap is worse
  * than an explicit failure, so exceptions propagate to the caller.
+ *
+ * `stream()` is the primary API and yields entries lazily, so a site with a
+ * million URLs never holds a million `SitemapEntry` objects at once. Only the
+ * set of already-emitted locations is retained, because de-duplication is
+ * order-dependent and cannot be resolved without remembering what came first.
  */
 final readonly class SitemapAggregator
 {
     public function __construct(private Container $container) {}
 
     /**
+     * Every entry, in provider order, with duplicate locations removed.
+     *
+     * Retained for callers that need a countable array. Prefer `stream()` when
+     * rendering, because materialising every entry is what makes large sitemaps
+     * expensive.
+     *
      * @return list<SitemapEntry>
      */
     public function entries(): array
     {
-        $entries = [];
+        return iterator_to_array($this->stream(), false);
+    }
+
+    /**
+     * Lazily yield every entry, in provider order, with duplicate locations removed.
+     *
+     * @return Generator<int, SitemapEntry>
+     */
+    public function stream(): Generator
+    {
         $seen = [];
 
         foreach ($this->container->tagged(SitemapProvider::PROVIDER_TAG) as $provider) {
@@ -51,10 +72,9 @@ final readonly class SitemapAggregator
                 }
 
                 $seen[$entry->loc] = true;
-                $entries[] = $entry;
+
+                yield $entry;
             }
         }
-
-        return $entries;
     }
 }

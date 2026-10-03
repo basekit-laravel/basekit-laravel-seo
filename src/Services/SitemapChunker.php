@@ -19,19 +19,16 @@ use InvalidArgumentException;
  * document is never larger than `max_bytes`. Splitting never cuts inside an
  * entry; an individual entry that cannot fit in a document on its own raises a
  * meaningful exception instead of producing an unusable chunk.
+ *
+ * The class is deliberately stateless: all per-run bookkeeping lives in locals
+ * inside `chunk()`, so a single instance can safely serve concurrent or
+ * re-entrant calls. That matters because the class is shared as a container
+ * singleton, and long-running workers (Octane) keep that instance alive across
+ * requests — instance state would otherwise leak between requests and an
+ * aborted run would retain a whole document's worth of entries.
  */
 final class SitemapChunker
 {
-    /** @var list<SitemapDocument> */
-    private array $documents = [];
-
-    /** @var list<SitemapEntry> */
-    private array $buffer = [];
-
-    private int $count = 0;
-
-    private int $bytes = 0;
-
     public function __construct(
         private readonly SitemapRenderer $renderer,
         private readonly int $maxUrls,
@@ -59,19 +56,21 @@ final class SitemapChunker
      */
     public function chunk(iterable $entries, callable $onChunk): SitemapCatalog
     {
-        $this->documents = [];
-        $this->buffer = [];
-        $this->count = 0;
-        $this->bytes = $this->renderer->scaffoldBytes();
+        $scaffold = $this->renderer->scaffoldBytes();
+
+        $documents = [];
+        $buffer = [];
+        $count = 0;
+        $bytes = $scaffold;
 
         foreach ($entries as $entry) {
             $fragmentBytes = $this->renderer->entryBytes($entry);
 
-            if ($this->count > 0 && ($this->count + 1 > $this->maxUrls || $this->bytes + $fragmentBytes > $this->maxBytes)) {
-                $this->flush($onChunk);
+            if ($count > 0 && ($count + 1 > $this->maxUrls || $bytes + $fragmentBytes > $this->maxBytes)) {
+                $this->flush($onChunk, $documents, $buffer, $count, $bytes, $scaffold);
             }
 
-            if ($this->bytes + $fragmentBytes > $this->maxBytes) {
+            if ($bytes + $fragmentBytes > $this->maxBytes) {
                 throw new InvalidArgumentException(sprintf(
                     'The sitemap entry [%s] serializes to %d bytes, which exceeds the configured maximum sitemap document size (%d bytes).',
                     $entry->loc,
@@ -80,43 +79,56 @@ final class SitemapChunker
                 ));
             }
 
-            $this->buffer[] = $entry;
-            $this->count++;
-            $this->bytes += $fragmentBytes;
+            $buffer[] = $entry;
+            $count++;
+            $bytes += $fragmentBytes;
         }
 
-        $this->flush($onChunk);
+        $this->flush($onChunk, $documents, $buffer, $count, $bytes, $scaffold);
 
-        if ($this->documents === []) {
+        if ($documents === []) {
             $onChunk(1, []);
 
-            $this->documents[] = new SitemapDocument(
+            $documents[] = new SitemapDocument(
                 index: 1,
                 count: 0,
-                bytes: $this->renderer->scaffoldBytes(),
+                bytes: $scaffold,
             );
         }
 
-        return new SitemapCatalog($this->documents);
+        return new SitemapCatalog($documents);
     }
 
     /**
+     * Finalize the buffered entries as a document and reset the run state.
+     *
+     * Every argument is a local variable of `chunk()`, passed by reference so
+     * this method stays allocation-free while keeping the state off `$this`.
+     *
+     * @param  list<SitemapDocument>  $documents
+     * @param  list<SitemapEntry>  $buffer
      * @param  callable(int, list<SitemapEntry>): void  $onChunk
      */
-    private function flush(callable $onChunk): void
-    {
-        if ($this->count === 0) {
+    private function flush(
+        callable $onChunk,
+        array &$documents,
+        array &$buffer,
+        int &$count,
+        int &$bytes,
+        int $scaffold,
+    ): void {
+        if ($count === 0) {
             return;
         }
 
-        $index = count($this->documents) + 1;
+        $index = count($documents) + 1;
 
-        $onChunk($index, $this->buffer);
+        $onChunk($index, $buffer);
 
-        $this->documents[] = new SitemapDocument(index: $index, count: $this->count, bytes: $this->bytes);
+        $documents[] = new SitemapDocument(index: $index, count: $count, bytes: $bytes);
 
-        $this->buffer = [];
-        $this->count = 0;
-        $this->bytes = $this->renderer->scaffoldBytes();
+        $buffer = [];
+        $count = 0;
+        $bytes = $scaffold;
     }
 }

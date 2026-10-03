@@ -196,3 +196,65 @@ it('preserves entry order within chunks and across documents', function (): void
     expect(array_map(static fn (SitemapEntry $entry): string => $entry->loc, $order))
         ->toBe(['https://example.test/pages/1', 'https://example.test/pages/2', 'https://example.test/pages/3', 'https://example.test/pages/4', 'https://example.test/pages/5']);
 });
+
+it('keeps document indices correct when a run is re-entered', function (): void {
+    // The chunker is shared as a container singleton, so an instance that kept
+    // per-run state on $this would interleave two concurrent runs: the inner
+    // run's documents would advance the shared counter and the outer run would
+    // be numbered 1, 4, 5 instead of 1, 2, 3.
+    $chunker = new SitemapChunker(chunker_renderer(), 2, PHP_INT_MAX);
+
+    $entry = static fn (string $slug): SitemapEntry => new SitemapEntry('https://example.test/'.$slug);
+
+    $outer = [];
+    $inner = [];
+
+    $chunker->chunk(
+        [$entry('a'), $entry('b'), $entry('c'), $entry('d'), $entry('e')],
+        static function (int $index, array $slice) use (&$outer, $chunker, $entry, &$inner): void {
+            $outer[$index] = array_map(static fn (SitemapEntry $e): string => $e->loc, $slice);
+
+            if ($index === 1) {
+                $chunker->chunk(
+                    [$entry('x'), $entry('y'), $entry('z')],
+                    static function (int $i, array $s) use (&$inner): void {
+                        $inner[$i] = count($s);
+                    },
+                );
+            }
+        },
+    );
+
+    expect($outer)->toBe([
+        1 => ['https://example.test/a', 'https://example.test/b'],
+        2 => ['https://example.test/c', 'https://example.test/d'],
+        3 => ['https://example.test/e'],
+    ])->and($inner)->toBe([1 => 2, 2 => 1]);
+});
+
+it('releases buffered entries when a provider fails mid-stream', function (): void {
+    // An aborted run used to leave its buffer on the singleton, retaining up to
+    // max_urls entries for the lifetime of a long-running worker.
+    $chunker = new SitemapChunker(chunker_renderer(), 50_000, 50 * 1024 * 1024);
+
+    $stream = (static function (): Generator {
+        for ($i = 0; $i < 5_000; $i++) {
+            yield new SitemapEntry('https://example.test/pages/'.$i);
+        }
+
+        throw new RuntimeException('provider exploded');
+    })();
+
+    expect(fn (): SitemapCatalog => $chunker->chunk($stream, static fn (): null => null))
+        ->toThrow(RuntimeException::class, 'provider exploded');
+
+    $mutable = array_map(
+        static fn (ReflectionProperty $p): string => $p->getName(),
+        array_filter(
+            (new ReflectionClass($chunker))->getProperties(),
+            static fn (ReflectionProperty $p): bool => ! $p->isReadOnly(),
+        ),
+    );
+
+    expect($mutable)->toBe([]);
+});
