@@ -8,6 +8,7 @@ use BasekitLaravel\BasekitLaravelSeo\Support\CanonicalUrl;
 use BasekitLaravel\BasekitLaravelSeo\Support\WebPageSchema;
 use BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs\ContentPage;
 use BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs\ContentPageSeoResolver;
+use BasekitLaravel\BasekitLaravelSeo\Tests\TestSupport\Stubs\CountingSeoResolver;
 
 it('provides the seo helper returning the shared manager', function (): void {
     expect(seo())->toBeInstanceOf(SeoManager::class)
@@ -143,4 +144,40 @@ it('uses a safe canonical from the manager', function (): void {
     seo()->canonicalUrl(CanonicalUrl::from('https://example.test/final'));
 
     expect(seo()->data()->canonicalUrl?->toString())->toBe('https://example.test/final');
+});
+
+it('memoises data() so repeated calls do not re-run the resolvers', function (): void {
+    app()->tag(CountingSeoResolver::class, SeoManager::RESOLVER_TAG);
+
+    $manager = seo()->for(new ContentPage('A', 'B', 'https://example.test/pages/1'));
+
+    $first = $manager->data();
+    $second = $manager->data();
+
+    expect(CountingSeoResolver::$calls)->toBe(1)
+        ->and($second)->toBe($first);
+
+    CountingSeoResolver::$calls = 0;
+});
+
+it('discards the memoised data after every mutation', function (): void {
+    $manager = seo();
+
+    expect($manager->data()->title)->not->toBe('Explicit');
+
+    $manager->title('Explicit');
+
+    expect($manager->data()->title)->toBe('Explicit');
+
+    $manager->reset();
+
+    expect($manager->data()->title)->not->toBe('Explicit');
+
+    $manager->description('Changed after reading data()');
+
+    expect($manager->data()->description)->toBe('Changed after reading data()');
+
+    $manager->for(new stdClass)->title('After retargeting');
+
+    expect($manager->data()->title)->toBe('After retargeting');
 });

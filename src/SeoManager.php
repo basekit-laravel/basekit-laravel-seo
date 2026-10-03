@@ -12,6 +12,7 @@ use BasekitLaravel\BasekitLaravelSeo\Support\RobotsMeta;
 use BasekitLaravel\BasekitLaravelSeo\Support\Schema;
 use BasekitLaravel\BasekitLaravelSeo\Support\Title;
 use BasekitLaravel\BasekitLaravelSeo\Support\TwitterMeta;
+use Closure;
 use Illuminate\Contracts\Container\Container;
 
 /**
@@ -41,6 +42,15 @@ final class SeoManager
 
     private bool $hasSubject = false;
 
+    /**
+     * Memoised result of {@see self::data()}.
+     *
+     * Resolution runs every registered SeoResolver, which routinely hits the
+     * database. The meta component calls data() more than once per render, so
+     * without this memo a single page render would repeat those queries.
+     */
+    private ?SeoData $resolved = null;
+
     public function __construct(private readonly Container $container)
     {
         $this->explicit = SeoData::make();
@@ -48,23 +58,17 @@ final class SeoManager
 
     public function title(?string $title): static
     {
-        $this->explicit = $this->explicit->withTitle($title);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withTitle($title));
     }
 
     public function description(?string $description): static
     {
-        $this->explicit = $this->explicit->withDescription($description);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withDescription($description));
     }
 
     public function canonicalUrl(string|CanonicalUrl|null $url): static
     {
-        $this->explicit = $this->explicit->withCanonicalUrl($url);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withCanonicalUrl($url));
     }
 
     /**
@@ -72,9 +76,7 @@ final class SeoManager
      */
     public function robots(RobotsMeta|string|array|null $directives): static
     {
-        $this->explicit = $this->explicit->withRobots($directives);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withRobots($directives));
     }
 
     /**
@@ -82,9 +84,7 @@ final class SeoManager
      */
     public function openGraph(OpenGraph|array|null $openGraph): static
     {
-        $this->explicit = $this->explicit->withOpenGraph($openGraph);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withOpenGraph($openGraph));
     }
 
     /**
@@ -92,23 +92,17 @@ final class SeoManager
      */
     public function twitter(TwitterMeta|array|null $twitter): static
     {
-        $this->explicit = $this->explicit->withTwitter($twitter);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withTwitter($twitter));
     }
 
     public function locale(?string $locale): static
     {
-        $this->explicit = $this->explicit->withLocale($locale);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withLocale($locale));
     }
 
     public function alternate(string $hreflang, string|CanonicalUrl $url): static
     {
-        $this->explicit = $this->explicit->withAlternate($hreflang, $url);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withAlternate($hreflang, $url));
     }
 
     /**
@@ -116,9 +110,7 @@ final class SeoManager
      */
     public function schema(Schema|array $schema): static
     {
-        $this->explicit = $this->explicit->withSchema($schema);
-
-        return $this;
+        return $this->with(fn (SeoData $data): SeoData => $data->withSchema($schema));
     }
 
     /**
@@ -130,6 +122,7 @@ final class SeoManager
     {
         $this->subject = $subject;
         $this->hasSubject = true;
+        $this->resolved = null;
 
         return $this;
     }
@@ -138,6 +131,25 @@ final class SeoManager
      * Resolve the final metadata for the current state.
      */
     public function data(): SeoData
+    {
+        return $this->resolved ??= $this->resolveData();
+    }
+
+    /**
+     * Apply an explicit override and invalidate the memo.
+     *
+     * Every fluent setter routes through here, so adding a new setter cannot
+     * silently forget to clear the cache.
+     */
+    private function with(Closure $mutate): static
+    {
+        $this->explicit = $mutate($this->explicit);
+        $this->resolved = null;
+
+        return $this;
+    }
+
+    private function resolveData(): SeoData
     {
         $defaults = $this->defaults();
         $resolved = $this->hasSubject ? $this->resolve($this->subject) : null;
@@ -168,6 +180,7 @@ final class SeoManager
         $this->explicit = SeoData::make();
         $this->subject = null;
         $this->hasSubject = false;
+        $this->resolved = null;
 
         return $this;
     }
