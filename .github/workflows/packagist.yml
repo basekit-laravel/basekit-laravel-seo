@@ -1,0 +1,50 @@
+name: Publish to Packagist
+
+# release-please owns versioning: it tags a release and creates the GitHub
+# release. This workflow only mirrors those tags to Packagist, which is what
+# makes `composer require basekit-laravel/basekit-laravel-seo` resolvable for
+# consumers.
+#
+# It is a no-op until the repository is registered at
+# https://packagist.org/packages/basekit-laravel/basekit-laravel-seo and
+# PACKAGIST_API_TOKEN is added as a repository secret.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Update Packagist
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check the API token is configured
+        if: ${{ secrets.PACKAGIST_API_TOKEN == '' }}
+        run: |
+          echo "::warning::PACKAGIST_API_TOKEN is not set; skipping the Packagist update."
+          echo "Register https://packagist.org/packages/basekit-laravel/basekit-laravel-seo and add the token to continue."
+
+      - name: Check the package is registered with Packagist
+        if: ${{ secrets.PACKAGIST_API_TOKEN != '' }}
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' "https://packagist.org/packages/basekit-laravel/basekit-laravel-seo")
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Package is not registered on Packagist (HTTP $status). Register it before publishing."
+            exit 1
+          fi
+
+      - name: Trigger the Packagist update
+        if: ${{ secrets.PACKAGIST_API_TOKEN != '' }}
+        env:
+          PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
+        run: |
+          curl -sS -X POST \
+            --data-urlencode "package=basekit-laravel/basekit-laravel-seo" \
+            --data-urlencode "version=${GITHUB_REF_NAME}" \
+            -H "Authorization: Bearer ${PACKAGIST_API_TOKEN}" \
+            https://packagist.org/api/packages/basekit-laravel/basekit-laravel-seo
