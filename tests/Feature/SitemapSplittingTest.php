@@ -108,6 +108,35 @@ it('builds index locations from the trusted canonical origin under a poisoned Ho
         ]);
 });
 
+it('fails with an actionable error when a split sitemap has no trusted origin', function (): void {
+    // A <sitemapindex> has to reference absolute locations, so the package
+    // refuses to invent an origin. With no configured base_url, no app.url and
+    // an untrusted request host there is genuinely nothing safe to emit.
+    config()->set('basekit-laravel-seo.sitemap.max_urls', 2);
+    config()->set('basekit-laravel-seo.canonical.base_url', null);
+    config()->set('basekit-laravel-seo.canonical.trusted_hosts', []);
+    config()->set('app.url', null);
+
+    bind_series_provider(3);
+
+    $this->withoutExceptionHandling()
+        ->get('/sitemap.xml', ['Host' => 'attacker.example']);
+})->throws(RuntimeException::class, 'A sitemap index requires a trusted canonical origin');
+
+it('still serves a single-document sitemap without any trusted origin', function (): void {
+    // An unsplit <urlset> uses provider-supplied absolute locations, so it needs
+    // no origin and must keep working.
+    config()->set('basekit-laravel-seo.canonical.base_url', null);
+    config()->set('basekit-laravel-seo.canonical.trusted_hosts', []);
+    config()->set('app.url', null);
+
+    bind_series_provider(2);
+
+    expect($this->get('/sitemap.xml', ['Host' => 'attacker.example'])->assertOk()->getContent())
+        ->toContain('<loc>https://example.test/pages/1</loc>')
+        ->not->toContain('attacker.example');
+});
+
 it('splits by byte size through configuration', function (): void {
     $renderer = app(SitemapRenderer::class);
 

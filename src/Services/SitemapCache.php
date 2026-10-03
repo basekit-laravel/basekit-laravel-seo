@@ -6,6 +6,7 @@ namespace BasekitLaravel\BasekitLaravelSeo\Services;
 
 use BasekitLaravel\BasekitLaravelSeo\Support\SitemapCatalog;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
 use InvalidArgumentException;
 
@@ -15,8 +16,8 @@ use InvalidArgumentException;
  * Cache keys are deterministic and versioned so a future package release can
  * bump the namespace instead of shipping incompatible entries. The aggregated
  * catalog lives under the `:index` key and each rendered chunk under its own
- * `:1..N` key; a tiny registry of written keys lets `clear()` remove every
- * package-owned key on any cache driver without relying on tags.
+ * `:1..N` key. Document keys are fully derivable from that namespace, so
+ * `clear()` can remove every package-owned key without a separate registry.
  *
  * Only aggregate generation is cached — normal `<head>` rendering never touches
  * the cache. When caching is disabled the service degrades to a transparent
@@ -31,7 +32,14 @@ final readonly class SitemapCache
 
     private const string KEY_INDEX = self::KEY_PREFIX.':index';
 
-    private const string KEY_REGISTRY = self::KEY_PREFIX.':keys';
+    private const string LOCK_KEY = self::KEY_PREFIX.':regenerate-lock';
+
+    /**
+     * How many chunk keys `clear()` sweeps when no catalog has been cached, so
+     * orphans left behind by an aborted generation are still removed without
+     * the sweep becoming unbounded.
+     */
+    private const int CLEAR_FALLBACK_CHUNKS = 64;
 
     public function __construct(private CacheManager $cache) {}
 
@@ -67,8 +75,6 @@ final readonly class SitemapCache
         }
 
         $this->store()->put(self::KEY_INDEX, $catalog->toArray(), $this->ttl());
-
-        $this->register(self::KEY_INDEX);
     }
 
     /**
@@ -95,8 +101,45 @@ final readonly class SitemapCache
         }
 
         $this->store()->put($this->documentKey($index), $xml, $this->ttl());
+    }
 
-        $this->register($this->documentKey($index));
+    /**
+     * Run `$callback` while holding a regeneration lock.
+     *
+     * Sitemaps are fetched by crawlers in bursts: the base document and then
+     * every chunk, back to back. When the cache expires all of those requests
+     * miss simultaneously, and without coordination each one would regenerate
+     * the whole sitemap. Serialising them behind a lock means a single
+     * regeneration serves the entire burst.
+     *
+     * Stores without lock support (and the `null`/`array` drivers used in
+     * tests) run the callback directly rather than failing.
+     *
+     * @template TResult
+     *
+     * @param  callable(): TResult  $callback
+     * @return TResult
+     */
+    public function synchronized(callable $callback, int $seconds = 10): mixed
+    {
+        $provider = $this->store()->getStore();
+
+        if (! $provider instanceof LockProvider) {
+            return $callback();
+        }
+
+        return $provider->lock(self::LOCK_KEY, $seconds)->get($callback);
+    }
+
+    /**
+     * Whether sitemap caching is switched on.
+     *
+     * Exposed so callers can skip their own memoization when the cache already
+     * holds the rendered documents.
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled();
     }
 
     /**
@@ -105,7 +148,11 @@ final readonly class SitemapCache
      *
      * This is the intended invalidation API for consumers — domain packages may
      * call `app(SitemapCache::class)->clear()` after content changes without
-     * knowing any cache internals.
+     * knowing any cache internals. Chunk keys are a contiguous `:1..N` range
+     * underneath the package's own key prefix, so they are swept directly; a
+     * cached catalog tells us how many to sweep, and the fallback sweep keeps
+     * orphaned keys from an aborted generation from surviving when no catalog
+     * was ever written.
      */
     public function clear(): void
     {
@@ -113,15 +160,18 @@ final readonly class SitemapCache
             return;
         }
 
-        $keys = $this->store()->get(self::KEY_REGISTRY);
+        $store = $this->store();
 
-        if (is_array($keys)) {
-            foreach ($keys as $key) {
-                $this->store()->forget((string) $key);
-            }
+        // Read the catalog *before* dropping the index, otherwise the chunk
+        // count is always zero and a large sitemap would keep stale documents.
+        $catalog = $this->catalog();
+        $chunks = $catalog instanceof SitemapCatalog ? $catalog->count() : 0;
+
+        $store->forget(self::KEY_INDEX);
+
+        for ($index = 1; $index <= max($chunks, self::CLEAR_FALLBACK_CHUNKS); $index++) {
+            $store->forget($this->documentKey($index));
         }
-
-        $this->store()->forget(self::KEY_REGISTRY);
     }
 
     private function documentKey(int $index): string
@@ -150,17 +200,5 @@ final readonly class SitemapCache
         $name = config('basekit-laravel-seo.sitemap.cache.store');
 
         return $this->cache->store($name === '' || $name === null ? null : $name);
-    }
-
-    private function register(string $key): void
-    {
-        $keys = $this->store()->get(self::KEY_REGISTRY);
-        $list = is_array($keys) ? $keys : [];
-
-        if (! in_array($key, $list, true)) {
-            $list[] = $key;
-        }
-
-        $this->store()->put(self::KEY_REGISTRY, $list, $this->ttl());
     }
 }
