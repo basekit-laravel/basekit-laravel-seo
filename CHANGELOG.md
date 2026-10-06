@@ -5,6 +5,14 @@ All notable user-visible changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1](https://github.com/basekit-laravel/basekit-laravel-seo/compare/v1.1.0...v1.1.1) (2026-10-06)
+
+
+### Miscellaneous Chores
+
+* **ci:** bump actions/upload-artifact ([e7a187c](https://github.com/basekit-laravel/basekit-laravel-seo/commit/e7a187c42026943a6f25f1d6d28cec99c3b20fdf))
+* **ci:** bump actions/upload-artifact from 4 to 7 in the github-actions group ([8d8928d](https://github.com/basekit-laravel/basekit-laravel-seo/commit/8d8928d62a5b658c863bc0f55a15163c91ebbf6e))
+
 ## [1.1.0](https://github.com/basekit-laravel/basekit-laravel-seo/compare/v1.0.1...v1.1.0) (2026-10-03)
 
 
